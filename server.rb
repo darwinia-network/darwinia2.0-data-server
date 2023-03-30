@@ -14,8 +14,8 @@ get '/crab' do
   result = File.read(File.join(__dir__, 'data.json'))
   result = JSON.parse(result)
 
-  t_list = %w[crb_reserved_in_staking ckton_reserved_in_staking crab_in_deposit]
-  if params['t'] && %w[crab_reserved_in_staking].include?(params['t'])
+  t_list = %w[crab_reserved_in_staking ckton_reserved_in_staking crab_in_deposit]
+  if params['t'] && t_list.include?(params['t'])
     content_type :text
     return result[params['t']].to_s
   end
