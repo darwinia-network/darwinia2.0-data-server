@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RUBY_MODULE" version="4">
+  <component name="ModuleRunConfigurationManager">
+    <shared />
+  </component>
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/features" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
+    </content>
+    <orderEntry type="jdk" jdkName="RVM: ruby-2.7.2" jdkType="RUBY_SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="scale_rb (v0.1.4) [path][gem]" type="rubylib">
+        <properties>
+          <option name="version" value="4" />
+        </properties>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/bin" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/exe" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/lib" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/pkg" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/.git" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/spec" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/.idea" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/bin" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/exe" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/lib" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/pkg" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/.git" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/spec" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/.idea" />
+        </SOURCES>
+        <excluded>
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/bin" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/exe" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/pkg" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/.git" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/spec" />
+          <root url="file://$MODULE_DIR$/../../wuminzhe/scale_rb/.idea" />
+        </excluded>
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="PROVIDED" name="blake2b_rs (v0.1.4, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ffi (v1.15.5, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="minitar (v0.9, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="mustermann (v3.0.0, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rack (v2.2.6.4, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rack-protection (v3.0.5, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rake (v13.0.6, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ruby2_keywords (v0.0.5, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="schnorrkel_rb (v0.1.1, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="sinatra (v3.0.5, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="thermite (v0.13.0, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="tilt (v2.1.0, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="tomlrb (v1.3.0, RVM: ruby-2.7.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="xxhash (v0.5.0, RVM: ruby-2.7.2) [gem]" level="application" />
+  </component>
+</module>
