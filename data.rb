@@ -128,13 +128,13 @@ def get_data
 
   {
     total_supply: total_supply,
-    #
-    crab_in_staking: crab_in_staking,
-    ckton_in_staking: ckton_in_staking,
-    crab_in_deposit: crab_in_deposit,
-    reserved: reserved,
-    locked: locked,
-    # 
+    illiquid: { 
+      crab_in_staking: crab_in_staking,
+      ckton_in_staking: ckton_in_staking,
+      crab_in_deposit: crab_in_deposit,
+      reserved: reserved,
+      locked: locked
+    },
     circulating_supply: circulating_supply
   }
 end
