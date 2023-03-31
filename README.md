@@ -50,3 +50,7 @@ bundle install
       curl http://127.0.0.1:4567/crab?t=ckton_reserved_in_staking
       curl http://127.0.0.1:4567/crab?t=crab_in_deposit
       ```
+
+## Https for dev env
+
+https://cors.kahub.in/http://123.58.217.13:4567/crab

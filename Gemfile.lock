@@ -13,8 +13,8 @@ GEM
       rack
     rake (13.0.6)
     ruby2_keywords (0.0.5)
-    scale_rb (0.1.4)
-      blake2b_rs (~> 0.1.2)
+    scale_rb (0.1.5)
+      blake2b_rs (~> 0.1.4)
       xxhash
     sinatra (3.0.5)
       mustermann (~> 3.0)
@@ -34,7 +34,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  scale_rb (= 0.1.4)
+  scale_rb (= 0.1.5)
   sinatra
 
 BUNDLED WITH

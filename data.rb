@@ -25,9 +25,15 @@ def get_data
   end
   crab_in_deposit = (crab_in_deposit / 10**18).floor
 
+  #
+  total_issuance = ScaleRb::HttpClient.get_storage2(url, 'Balances', 'TotalIssuance', nil, metadata)
+  total_issuance = (total_issuance / 10**18).floor
+  
+
   {
     crab_reserved_in_staking: crab_reserved_in_staking,
     ckton_reserved_in_staking: ckton_reserved_in_staking,
-    crab_in_deposit: crab_in_deposit
+    crab_in_deposit: crab_in_deposit,
+    total_issuance: total_issuance
   }
 end
