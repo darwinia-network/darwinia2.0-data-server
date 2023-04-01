@@ -26,3 +26,8 @@ get '/crab' do
     data: result
   }.to_json
 end
+
+get '/crab/metadata' do
+  content_type :json
+  metadata.to_json
+end
