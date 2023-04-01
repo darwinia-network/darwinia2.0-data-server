@@ -59,14 +59,6 @@ get '/crab/:pallet_name/:storage_name/?:key1?/?:key2?' do
   key = [params[:key1], params[:key2]].compact.map { |part_of_key| c(part_of_key) }
   storage = ScaleRb::HttpClient.get_storage2(url, pallet_name, storage_name, key, metadata)
 
-  # if !params[:key1]
-  #   storage = ScaleRb::HttpClient.get_storage2(url, pallet_name, storage_name, [], metadata)
-  # elsif params[:key1] && !params[:key2]
-  #   storage = ScaleRb::HttpClient.get_storage2(url, pallet_name, storage_name, [c(params[:key1])], metadata)
-  # elsif params[:key1] && params[:key2]
-  #   storage = ScaleRb::HttpClient.get_storage2(url, pallet_name, storage_name, [c(params[:key1]), c(params[:key2])], metadata)
-  # end
-
   content_type :json
   render_json storage
 end
