@@ -11,7 +11,7 @@ get '/' do
   'Hello Darwinia!'
 end
 
-get '/crab/statistic' do
+get '/crab/stat' do
   result = File.read(File.join(__dir__, 'data.json'))
   result = JSON.parse(result)
 
