@@ -2,6 +2,30 @@
 
 Server providing data of Darwina data
 
+# API
+
+1. Retrieve arbitrary storage's data. For now, there is no cache for this api. so if the storage's data is large, it will take a while to load, especially for the `1.4`'s result. 
+      * no param. for example:
+      `/crab/balances/total_issuance`
+
+      * single map. for example:
+      `/crab/vesting/vesting/0x3d6A81177e17d5DbBD36f23Ea5328aCdF3471209`
+
+      * double map. for example:
+      `/crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab`
+      note: 
+        * `0` is the first param;
+        *`0x0a1287977578F888bdc1c7627781AF1cc000e6ab` is the second param;
+
+      * map without param. it will retrieve all storages under it. for example, this will return all unmigrated deposits:
+      `/crab/account_migration/deposits`
+
+2. Retrieve the latest decoded metadata.
+http://123.58.217.13:4567/crab/metadata
+
+3. Crab's statistical data
+http://123.58.217.13:4567/crab/stat
+
 ## Important Files
 
 * server.rb  
@@ -41,14 +65,13 @@ bundle install
 
    2. Run server
       ```bash
-      ./run.sh
+      bundle exec rake update_metadata_loop
+      bundle exec rake gen_data_loop
+      APP_ENV=production bundle exec rackup -o 0.0.0.0 -p 4567
       ```
 
       ```bash
-      curl http://127.0.0.1:4567/crab
-      curl http://127.0.0.1:4567/crab?t=crab_reserved_in_staking
-      curl http://127.0.0.1:4567/crab?t=ckton_reserved_in_staking
-      curl http://127.0.0.1:4567/crab?t=crab_in_deposit
+      curl http://127.0.0.1:4567/crab/stat
       ```
 
 ## Https for dev env
