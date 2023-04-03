@@ -1,11 +1,7 @@
 require 'sinatra'
 require "scale_rb"
+require './config/config.rb'
 require './utils'
-
-# prepare darwinia metadata
-metadata_content = File.read(File.join(__dir__, 'config', 'crab2.json'))
-metadata = JSON.parse(metadata_content)
-url = 'https://crab-rpc.darwinia.network'
 
 get '/' do
   'Hello Darwinia!'
@@ -29,6 +25,12 @@ get '/crab/stat' do
 end
 
 get '/crab/metadata' do
+  metadata = JSON.parse(
+    File.read(
+      config[:metadata][:crab2]
+    )
+  )
+
   content_type :json
   metadata.to_json
 end
@@ -56,8 +58,14 @@ get '/crab/:pallet_name/:storage_name/?:key1?/?:key2?' do
   
   puts "#{pallet_name}##{storage_name}(#{[params[:key1], params[:key2]].compact.join(", ")})"
 
+  metadata = JSON.parse(
+    File.read(
+      config[:metadata][:crab2]
+    )
+  )
+
   key = [params[:key1], params[:key2]].compact.map { |part_of_key| c(part_of_key) }
-  storage = ScaleRb::HttpClient.get_storage2(url, pallet_name, storage_name, key, metadata)
+  storage = ScaleRb::HttpClient.get_storage2(config[:url], pallet_name, storage_name, key, metadata)
 
   content_type :json
   render_json storage

@@ -1,4 +1,5 @@
 require "scale_rb"
+require './config/config.rb'
 
 # ## Storage
 # -------------------------------
@@ -65,11 +66,13 @@ require "scale_rb"
 # unbonding = ledger.unstakingRing
 
 def get_data
-  # prepare darwinia metadata
-  metadata_content = File.read(File.join(__dir__, 'config', 'crab2.json'))
-  metadata = JSON.parse(metadata_content)
+  metadata = JSON.parse(
+    File.read(
+      config[:metadata][:crab2]
+    )
+  )
 
-  url = 'https://crab-rpc.darwinia.network'
+  url = config[:url]
 
   # TOTAL SUPPLY
   total_issuance = ScaleRb::HttpClient.get_storage2(url, 'Balances', 'TotalIssuance', nil, metadata)
