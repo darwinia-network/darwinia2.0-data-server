@@ -1,6 +1,6 @@
 # darwinia2.0-data-server
 
-A server that provides various services related to Darwinia.
+A server that provides various data related to Darwinia.
 
 # APIs
 
