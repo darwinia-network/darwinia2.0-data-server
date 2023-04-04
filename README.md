@@ -1,30 +1,41 @@
 # darwinia2.0-data-server
 
-Server providing data of Darwina data
+A server that provides various data related to Darwinia.
 
-# API
+# APIs
 
 1. Retrieve arbitrary storage's data. For now, there is no cache for this api. so if the storage's data is large, it will take a while to load, especially for the `1.4`'s result. 
-      * no param. for example:
-      `/crab/balances/total_issuance`
+      * no param. for example:  
+        ```
+        /crab/balances/total_issuance
+        ```
 
-      * single map. for example:
-      `/crab/vesting/vesting/0x3d6A81177e17d5DbBD36f23Ea5328aCdF3471209`
+      * single map. for example:  
+        ```
+        /crab/vesting/vesting/0x3d6A81177e17d5DbBD36f23Ea5328aCdF3471209
+        ```
 
-      * double map. for example:
-      `/crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab`
-      note: 
+      * double map. for example:    
+        ```
+        /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
+        ```
         * `0` is the first param;
-        *`0x0a1287977578F888bdc1c7627781AF1cc000e6ab` is the second param;
+        * `0x0a1287977578F888bdc1c7627781AF1cc000e6ab` is the second param;  
 
-      * map without param. it will retrieve all storages under it. for example, this will return all unmigrated deposits:
-      `/crab/account_migration/deposits`
+      * map without param. it will retrieve all storages under it. for example, this will return all unmigrated deposits:  
+        ```
+        /crab/account_migration/deposits
+        ``` 
 
-2. Retrieve the latest decoded metadata.
-http://123.58.217.13:4567/crab/metadata
+2. Retrieve the latest decoded metadata.  
+   ```
+   /crab/metadata
+   ```
 
-3. Crab's statistical data
-http://123.58.217.13:4567/crab/stat
+3. Crab's statistical data.  
+   ```
+   /crab/stat
+   ```
 
 ## Important Files
 
