@@ -64,6 +64,10 @@ get '/crab/:pallet_name/:storage_name/?:key1?/?:key2?' do
     )
   )
 
+  if pallet_name == 'AccountMigration' && params[:key1] && params[:key1].start_with?('5')
+    params[:key1] = "0x#{Address.decode(params[:key1], 42, true)}"
+  end
+
   key = [params[:key1], params[:key2]].compact.map { |part_of_key| c(part_of_key) }
   storage = ScaleRb::HttpClient.get_storage2(config[:url], pallet_name, storage_name, key, metadata)
 
