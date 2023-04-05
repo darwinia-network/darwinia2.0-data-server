@@ -35,6 +35,18 @@ get '/crab/metadata' do
   metadata.to_json
 end
 
+get '/crab/address/:address' do
+  # address must presented
+  return { code: 1, message: 'address is required' }.to_json unless params[:address]
+
+  if params[:address].length == 42
+    return { code: 0, data: { pubkey: "0x#{Address.decode(params[:address], 42, true)}", ss58: params[:address] } }.to_json
+  elsif params[:address].length == 66
+    raise "Not implemented yet"
+  else
+    return { code: 1, message: 'address is invalid' }.to_json
+  end
+end
 # write a action to get substrate pallets data
 # Example:
 # key is empty:
