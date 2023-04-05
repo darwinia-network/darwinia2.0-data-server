@@ -47,6 +47,55 @@ get '/crab/address/:address' do
     return { code: 1, message: 'address is invalid' }.to_json
   end
 end
+
+post '/pangolin/encode_transact_call' do
+  ethereum_contract = params[:ethereum_contract][2..];
+  ethereum_call = params[:ethereum_call][2..];
+  gas_limit = PortableCodec.u256(params[:gas_limit].to_i)
+
+  pangolin_endpoint = "0x5a07DB2bD2624DD2Bdd5093517048a0033A615b5"
+ 
+  # get market fee from pangolin endpoint
+  fee = ScaleRb::HttpClient.json_rpc_call(config[:pangolin_url], 'eth_call', {data: "0xddca3f43",gas: "0x5b8d80",to: pangolin_endpoint}, "latest")
+  fee = PortableCodec.u256(fee.to_i(16)) 
+
+  # calculate the call data of `executeOnEthereum` function of pangolin endpoint
+  call_length_hex = (ethereum_call.length / 2).to_s(16);
+  data_of_execute_on_ethereum = "0x6c069b1f000000000000000000000000#{ethereum_contract}0000000000000000000000000000000000000000000000000000000000000040#{call_length_hex.rjust(64, "0")}#{ethereum_call}00000000000000000000000000000000000000000000000000000000"
+ 
+  transact_call = {
+      :pallet_name=>"EthereumXcm", 
+      :call_name=>"Transact", 
+      :call=>[
+        {
+          :transact=>{
+            :xcm_transaction=>{
+              :V2=>{
+                :gas_limit=>gas_limit, 
+                :action=>{
+                  :Call=>pangolin_endpoint.to_bytes
+                }, 
+                :value=>fee, 
+                :input=>data_of_execute_on_ethereum.to_bytes, 
+                :access_list=>"None"
+              }
+            }
+          }
+        }, 
+        []
+      ]
+    }
+
+  metadata = JSON.parse(
+    File.read(
+      config[:metadata][:pangolin2]
+    )
+  )
+  encoded_call = Metadata.encode_call(transact_call, metadata)
+  content_type :json
+  render_json encoded_call.to_hex
+end
+
 # write a action to get substrate pallets data
 # Example:
 # key is empty:
