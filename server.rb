@@ -39,7 +39,7 @@ get '/crab/address/:address' do
   # address must presented
   return { code: 1, message: 'address is required' }.to_json unless params[:address]
 
-  if params[:address].length == 42
+  if params[:address].length == 48
     return { code: 0, data: { pubkey: "0x#{Address.decode(params[:address], 42, true)}", ss58: params[:address] } }.to_json
   elsif params[:address].length == 66
     raise "Not implemented yet"
