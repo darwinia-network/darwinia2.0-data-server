@@ -36,6 +36,7 @@ get '/crab/metadata' do
 end
 
 get '/crab/address/:address' do
+  content_type :json
   # address must presented
   return { code: 1, message: 'address is required' }.to_json unless params[:address]
 
