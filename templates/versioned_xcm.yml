@@ -1,0 +1,20 @@
+V2:
+  - WithdrawAsset:
+      - &asset
+        id:
+          Concrete:
+            parents: 1
+            interior:
+              X2:
+                - Parachain: 2105
+                - PalletInstance: 5
+        fun:
+          Fungible: 20000000000000000000
+  - BuyExecution:
+      fees: *asset
+      weight_limit: Unlimited
+  - Transact:
+      origin_type: SovereignAccount
+      require_weight_at_most: 5000000000
+      call:
+        encoded: [10, 7, 12, 49, 50, 51]

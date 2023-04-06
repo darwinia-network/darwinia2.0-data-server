@@ -2,6 +2,7 @@ require 'sinatra'
 require "scale_rb"
 require './config/config.rb'
 require './utils'
+require 'yaml'
 
 get '/' do
   'Hello Darwinia!'
@@ -47,6 +48,32 @@ get '/crab/address/:address' do
   else
     return { code: 1, message: 'address is invalid' }.to_json
   end
+end
+
+get '/pangolin/templates/versioned_xcm' do
+  content_type :yaml
+  File.read(File.join(__dir__, 'templates', 'versioned_xcm.yml'))
+end
+
+post '/pangolin/versioned_xcm' do
+  metadata = JSON.parse(
+    File.read(
+      config[:metadata][:pangolin2]
+    )
+  )
+  registry = Metadata.build_registry(metadata)
+
+  # Find portable type id of VersionedXcm. 
+  # We just need to find type id of `PolkadotXcm.Execute`'s first param.
+  call_type = Metadata.get_call_type("PolkadotXcm", "Execute", metadata)
+  versioned_xcm_type_id = call_type._get(:fields).first._get(:type)
+
+  # encode the value from request body
+  value = JSON.parse(YAML.load(request.body.read).to_json)
+  bytes = PortableCodec.encode(versioned_xcm_type_id, value, registry)
+
+  content_type :json
+  { code: 0, data: bytes.to_hex }.to_json
 end
 
 post '/pangolin/encode_transact_call' do
