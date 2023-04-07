@@ -50,9 +50,20 @@ get '/crab/address/:address' do
   end
 end
 
-get '/pangolin/templates/versioned_xcm' do
+get '/pangolin/templates/:filename' do
   content_type :yaml
-  File.read(File.join(__dir__, 'templates', 'versioned_xcm.yml'))
+
+  # check the file exists, and then render with 404
+  file = File.join(__dir__, 'templates', "#{params[:filename]}")
+  return 404 unless File.exist? file
+  File.read(file)
+end
+
+get '/pangolin/templates' do
+  # get file list in templates folder
+  files = Dir.entries(File.join(__dir__, 'templates')).select { |f| f.end_with?('.yml') }
+  content_type :json
+  { code: 0, data: files }.to_json
 end
 
 post '/pangolin/versioned_xcm' do
