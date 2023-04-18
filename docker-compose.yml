@@ -6,6 +6,8 @@ services:
   gen_data_loop:
     build: .
     command: rake gen_data_loop
+    volumes:
+      - ./data:/usr/src/app/data
   update_goerli_pangolin2_messages:
     build: .
     environment:
@@ -23,3 +25,5 @@ services:
     command: ruby server.rb
     ports:
       - "4567:4567"
+    volumes:
+      - ./data:/usr/src/app/data
