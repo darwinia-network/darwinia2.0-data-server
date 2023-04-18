@@ -45,21 +45,32 @@ def loop_do(sleep_time = 60 * 5)
   end
 end
 
-def generate_data(target_dir)
+def generate_crab_data
+  config = get_config
+  crab_metadata = JSON.parse(File.read(config[:metadata][:crab2]))
+  crab_rpc = config[:crab_rpc]
+  data_dir = "./data"
+
   timed do
     puts "generate statistic data..."
-    # generate dir if not exists
-    FileUtils.mkdir_p(target_dir) unless File.directory?(target_dir)
-    File.write(File.join(target_dir, "data.json"), get_data.to_json)
+    FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
+    File.write(
+      File.join(data_dir, "data.json"),
+      get_data(crab_metadata, crab_rpc).to_json,
+    )
   end
 end
 
-def update_metadata
+def update_crab_metadata
+  config = get_config
+  crab_metadata_path = config[:metadata][:crab2]
+  crab_rpc = config[:crab_rpc]
+
   timed do
     puts "update metadata..."
-    block_hash = ScaleRb::HttpClient.chain_getBlockHash config[:url]
-    metadata = ScaleRb::HttpClient.get_metadata(config[:url], block_hash)
+    block_hash = ScaleRb::HttpClient.chain_getBlockHash crab_rpc
+    metadata = ScaleRb::HttpClient.get_metadata(crab_rpc, block_hash)
     metadata = JSON.pretty_generate(metadata)
-    File.write(config[:metadata][:crab2], metadata)
+    File.write(crab_metadata_path, metadata)
   end
 end

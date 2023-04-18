@@ -8,5 +8,6 @@ gem "async", "~> 2.5"
 gem "mongo", "~> 2"
 # RUBY_CONFIGURE_OPTS="--disable-install-doc --disable-shared --with-openssl-dir=$(brew --prefix openssl@1.1)" gem install eth
 gem "eth"
+gem "config"
 gem "dotenv"
 gem "puma"

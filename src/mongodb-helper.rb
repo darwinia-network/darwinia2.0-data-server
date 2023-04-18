@@ -1,11 +1,16 @@
-require "dotenv/load"
 require "mongo"
+require_relative "../config/config.rb"
 
 module MongodbHelper
   class << self
     def client
       @client ||=
-        Mongo::Client.new(ENV["MONGODB_URI"], server_api: { version: "1" })
+        Mongo::Client.new(
+          get_config[:mongodb_uri],
+          server_api: {
+            version: "1",
+          },
+        )
     end
 
     def find_message(query)
@@ -34,12 +39,12 @@ module MongodbHelper
     end
 
     # { "key": "value", "key2": "value2" }
-    def get_config(key)
+    def get_setting(key)
       db = client[:config]
       db.find.first ? db.find.first[key] : nil
     end
 
-    def set_config(key, value)
+    def set_setting(key, value)
       db = client[:config]
       if db.find.first
         db.update_one({}, { "$set" => { key => value } })
@@ -50,5 +55,5 @@ module MongodbHelper
   end
 end
 
-# MongodbHelper.set_config("last_tracked_block", 1)
-# p MongodbHelper.get_config("last_tracked_block")
+# MongodbHelper.set_setting("last_tracked_block", 1)
+# p MongodbHelper.get_setting("last_tracked_block")

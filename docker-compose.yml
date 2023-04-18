@@ -2,28 +2,37 @@ version: "3"
 services:
   update_metadata_loop:
     build: .
+    environment:
+      - CRAB_ENDPOINT=${CRAB_ENDPOINT}
     command: rake update_metadata_loop
   gen_data_loop:
     build: .
+    environment:
+      - CRAB_ENDPOINT=${CRAB_ENDPOINT}
     command: rake gen_data_loop
     volumes:
-      - ./data:/usr/src/app/data
+      - ${DATA_DIR}:/usr/src/app/data
   update_goerli_pangolin2_messages:
     build: .
     environment:
       - GOERLI_ENDPOINT=${GOERLI_ENDPOINT}
+      - PANGOLIN_ENDPOINT=${PANGOLIN_ENDPOINT}
       - MONGODB_URI=${MONGODB_URI}
     command: rake update_goerli_pangolin2_messages
   update_pangolin2_goerli_messages:
     build: .
     environment:
       - PANGOLIN_ENDPOINT=${PANGOLIN_ENDPOINT}
+      - GOERLI_ENDPOINT=${GOERLI_ENDPOINT}
       - MONGODB_URI=${MONGODB_URI}
     command: rake update_pangolin2_goerli_messages
   server:
     build: .
-    command: ruby server.rb
+    environment:
+      - CRAB_ENDPOINT=${CRAB_ENDPOINT}
+      - PANGOLIN_ENDPOINT=${PANGOLIN_ENDPOINT}
+    command: ruby src/server.rb
     ports:
       - "4567:4567"
     volumes:
-      - ./data:/usr/src/app/data
+      - ${DATA_DIR}:/usr/src/app/data

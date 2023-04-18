@@ -2,8 +2,12 @@ require "dotenv/load"
 require "scale_rb"
 require_relative "./evm-track-helper"
 require_relative "./mongodb-helper"
+require_relative "../config/config.rb"
 
 def track_pangolin
+  config = get_config
+  pangolin_rpc = config[:pangolin_rpc]
+
   # Prepare the contracts to track
   # --------------------------------------------------------
   contracts_to_track = [
@@ -14,20 +18,20 @@ def track_pangolin
   # Prepare how to persist the last tracked block
   # --------------------------------------------------------
   get_last_tracked_block = -> do
-    if MongodbHelper.get_config("last_tracked_block_darwinia").nil?
+    if MongodbHelper.get_setting("last_tracked_block_darwinia").nil?
       0
     else
-      MongodbHelper.get_config("last_tracked_block_darwinia")
+      MongodbHelper.get_setting("last_tracked_block_darwinia")
     end
   end
 
   set_last_tracked_block = ->(number) do
-    MongodbHelper.set_config("last_tracked_block_darwinia", number)
+    MongodbHelper.set_setting("last_tracked_block_darwinia", number)
   end
 
   # Main
   # --------------------------------------------------------
-  evm_tracker_helper = EvmTrackHelper.new(ENV["PANGOLIN_ENDPOINT"])
+  evm_tracker_helper = EvmTrackHelper.new(pangolin_rpc)
   evm_tracker_helper.track_messages(
     contracts_to_track,
     get_last_tracked_block,

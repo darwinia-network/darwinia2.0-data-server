@@ -1,5 +1,4 @@
 require "scale_rb"
-require './config/config.rb'
 
 # ## Storage
 # -------------------------------
@@ -46,13 +45,13 @@ require './config/config.rb'
 # -------------------------------
 #
 # total
-# 14,712.4234 CRAB  = (transferrable + locked)(account_info.data.free) + reserved(account_info.data.reserved) 
+# 14,712.4234 CRAB  = (transferrable + locked)(account_info.data.free) + reserved(account_info.data.reserved)
 #
 # transferrable
 # 745.0897 CRAB = metamask balance
 #
 # locked
-# 13,767.1983 CRAB 
+# 13,767.1983 CRAB
 #   = balances.locks
 #   = max(account_info.data.miscFrozen, account_info.data.feeFrozen)
 #
@@ -65,55 +64,88 @@ require './config/config.rb'
 # Reserved in staking(bonded) = ledger.stakedRing
 # unbonding = ledger.unstakingRing
 
-def get_data
-  metadata = JSON.parse(
-    File.read(
-      config[:metadata][:crab2]
-    )
-  )
-
-  url = config[:url]
-
+def get_data(crab_metadata, crab_rpc)
   # TOTAL SUPPLY
-  total_issuance = ScaleRb::HttpClient.get_storage2(url, 'Balances', 'TotalIssuance', nil, metadata)
+  total_issuance =
+    ScaleRb::HttpClient.get_storage2(
+      crab_rpc,
+      "Balances",
+      "TotalIssuance",
+      nil,
+      crab_metadata,
+    )
   total_supply = (total_issuance / 10**18).floor
 
   # CRAB IN STAKING
-  crab_in_staking = ScaleRb::HttpClient.get_storage2(url, 'DarwiniaStaking', 'RingPool', nil, metadata)
+  crab_in_staking =
+    ScaleRb::HttpClient.get_storage2(
+      crab_rpc,
+      "DarwiniaStaking",
+      "RingPool",
+      nil,
+      crab_metadata,
+    )
   crab_in_staking = (crab_in_staking / 10**18).floor
 
   # CKTON IN STAKING
-  ckton_in_staking = ScaleRb::HttpClient.get_storage2(url, 'DarwiniaStaking', 'KtonPool', nil, metadata)
+  ckton_in_staking =
+    ScaleRb::HttpClient.get_storage2(
+      crab_rpc,
+      "DarwiniaStaking",
+      "KtonPool",
+      nil,
+      crab_metadata,
+    )
   ckton_in_staking = (ckton_in_staking / 10**18).floor
 
   # CRAB IN DEPOSIT
-  deposits = ScaleRb::HttpClient.get_storage2(url, 'Deposit', 'Deposits', nil, metadata)
-  crab_in_deposit = deposits.reduce(0) do |sum, deposit|
-    deposit[:storage].reduce(sum) do |sum, item|
-      sum + item[:value]
+  deposits =
+    ScaleRb::HttpClient.get_storage2(
+      crab_rpc,
+      "Deposit",
+      "Deposits",
+      nil,
+      crab_metadata,
+    )
+  crab_in_deposit =
+    deposits.reduce(0) do |sum, deposit|
+      deposit[:storage].reduce(sum) { |sum, item| sum + item[:value] }
     end
-  end
   crab_in_deposit = (crab_in_deposit / 10**18).floor
 
   # RESERVED
-  accounts = ScaleRb::HttpClient.get_storage2(url, 'System', 'Account', nil, metadata)
-  reserved = accounts.reduce(0) do |sum, account|
-    sum + account[:storage][:data][:reserved]
-  end
+  accounts =
+    ScaleRb::HttpClient.get_storage2(
+      crab_rpc,
+      "System",
+      "Account",
+      nil,
+      crab_metadata,
+    )
+  reserved =
+    accounts.reduce(0) do |sum, account|
+      sum + account[:storage][:data][:reserved]
+    end
   reserved = (reserved / 10**18).floor
 
   # LOCKED
-  locks = ScaleRb::HttpClient.get_storage2(url, 'Balances', 'Locks', nil, metadata)
-  locked = locks.reduce(0) do |sum, lock|
-    lock[:storage].reduce(sum) do |sum, item|
-      sum + item[:amount]
+  locks =
+    ScaleRb::HttpClient.get_storage2(
+      crab_rpc,
+      "Balances",
+      "Locks",
+      nil,
+      crab_metadata,
+    )
+  locked =
+    locks.reduce(0) do |sum, lock|
+      lock[:storage].reduce(sum) { |sum, item| sum + item[:amount] }
     end
-  end
   locked = (locked / 10**18).floor
 
   # VESTING LOCKED which is part of locked
-  # height = ScaleRb::HttpClient.get_storage2(url, 'System', 'Number', nil, metadata)
-  # vesting_list = ScaleRb::HttpClient.get_storage2(url, 'Vesting', 'Vesting', nil, metadata)
+  # height = ScaleRb::HttpClient.get_storage2(crab_rpc, 'System', 'Number', nil, crab_metadata)
+  # vesting_list = ScaleRb::HttpClient.get_storage2(crab_rpc, 'Vesting', 'Vesting', nil, crab_metadata)
   # vesting_locked = vesting_list.reduce(0) do |sum, vesting|
   #   vesting[:storage].reduce(sum) do |sum, item|
   #     sum + (item[:locked] - item[:per_block] * (height - item[:starting_block]))
@@ -127,17 +159,16 @@ def get_data
 
   # CIRCULATING SUPPLY
   circulating_supply = total_supply - _total_illiquid
-  
 
   {
     total_supply: total_supply,
-    illiquid: { 
+    illiquid: {
       crab_in_staking: crab_in_staking,
       ckton_in_staking: ckton_in_staking,
       crab_in_deposit: crab_in_deposit,
       reserved: reserved,
-      locked: locked
+      locked: locked,
     },
-    circulating_supply: circulating_supply
+    circulating_supply: circulating_supply,
   }
 end

@@ -1,15 +1,16 @@
 require "sinatra"
 require "scale_rb"
-require "./config/config.rb"
-require "./utils"
 require "yaml"
+require_relative "./utils"
+require_relative "../config/config.rb"
+config = get_config
 
 get "/" do
   "Hello Darwinia!"
 end
 
 get "/crab/stat" do
-  result = File.read(File.join(__dir__, "data.json"))
+  result = File.read("./data/data.json")
   result = JSON.parse(result)
 
   t_list = %w[
@@ -68,10 +69,7 @@ end
 
 get "/pangolin/templates" do
   # get file list in templates folder
-  files =
-    Dir
-      .entries(File.join(__dir__, "templates"))
-      .select { |f| f.end_with?(".yml") }
+  files = Dir.entries("./templates").select { |f| f.end_with?(".yml") }
   content_type :json
   { code: 0, data: files }.to_json
 end
@@ -104,7 +102,7 @@ post "/pangolin/encode_transact_call" do
   # get market fee from pangolin endpoint
   fee =
     ScaleRb::HttpClient.json_rpc_call(
-      config[:pangolin_url],
+      config[:pangolin_rpc],
       "eth_call",
       { data: "0xddca3f43", gas: "0x5b8d80", to: pangolin_endpoint },
       "latest",
@@ -179,7 +177,7 @@ get "/crab/:pallet_name/:storage_name/?:key1?/?:key2?" do
     [params[:key1], params[:key2]].compact.map { |part_of_key| c(part_of_key) }
   storage =
     ScaleRb::HttpClient.get_storage2(
-      config[:url],
+      config[:crab_rpc],
       pallet_name,
       storage_name,
       key,
