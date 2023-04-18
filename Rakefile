@@ -8,13 +8,15 @@ require "./src/track-pangolin"
 task default: %w[gen_data_loop]
 
 desc "Generate the statistic data"
-task :gen_data do
-  generate_data
+task :gen_data, [:dir] do |_, args|
+  target_dir = args[:dir] || "./data"
+  generate_data(target_dir)
 end
 
 desc "Generate the statistic data loop"
-task :gen_data_loop do
-  loop_do { generate_data }
+task :gen_data_loop, [:dir] do |_, args|
+  target_dir = args[:dir] || "./data"
+  loop_do { generate_data(target_dir) }
 end
 
 desc "Update metadata"

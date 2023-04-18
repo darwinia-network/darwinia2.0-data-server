@@ -1,6 +1,6 @@
 def to_camel(str)
-  if str.include?('_')
-    splits = str.split('_')
+  if str.include?("_")
+    splits = str.split("_")
     splits[0..].collect(&:capitalize).join
   else
     str[0].upcase + str[1..]
@@ -9,7 +9,7 @@ end
 
 # convert key
 def c(key)
-  if key.start_with?('0x')
+  if key.start_with?("0x")
     key.to_bytes
   elsif key.to_i.to_s == key # check if key is a number
     key.to_i
@@ -20,16 +20,10 @@ end
 
 def render_json(data)
   content_type :json
-  if data  
-    {
-      code: 0,
-      data: data
-    }.to_json
+  if data
+    { code: 0, data: data }.to_json
   else
-    { 
-      code: 1, 
-      message: 'not found' 
-    }.to_json
+    { code: 1, message: "not found" }.to_json
   end
 end
 
@@ -51,10 +45,12 @@ def loop_do(sleep_time = 60 * 5)
   end
 end
 
-def generate_data
+def generate_data(target_dir)
   timed do
     puts "generate statistic data..."
-    File.write(File.join(__dir__, 'data.json'), get_data.to_json)
+    # generate dir if not exists
+    FileUtils.mkdir_p(target_dir) unless File.directory?(target_dir)
+    File.write(File.join(target_dir, "data.json"), get_data.to_json)
   end
 end
 
@@ -64,9 +60,6 @@ def update_metadata
     block_hash = ScaleRb::HttpClient.chain_getBlockHash config[:url]
     metadata = ScaleRb::HttpClient.get_metadata(config[:url], block_hash)
     metadata = JSON.pretty_generate(metadata)
-    File.write(
-      config[:metadata][:crab2], 
-      metadata
-    )
+    File.write(config[:metadata][:crab2], metadata)
   end
 end
