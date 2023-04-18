@@ -2,8 +2,8 @@ require "scale_rb"
 require "./config/config.rb"
 require "./data"
 require "./utils"
-require "./src/track-ethereum"
-require "./src/track-darwinia"
+require "./src/track-goerli"
+require "./src/track-pangolin"
 
 task default: %w[gen_data_loop]
 
@@ -29,10 +29,10 @@ end
 
 desc "Update Goerli > Pangolin2 Messages"
 task :update_goerli_pangolin2_messages do
-  upload_goerli
+  track_goerli
 end
 
 desc "Update Pangolin2 > Goerli Messages"
 task :update_pangolin2_goerli_messages do
-  upload_pangolin
+  track_pangolin
 end
