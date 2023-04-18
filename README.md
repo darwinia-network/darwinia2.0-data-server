@@ -1,6 +1,6 @@
-# darwinia2.0-data-server
+# Darwinia data hub
 
-A server that provides various data related to Darwinia.
+A server that provides various data related to Darwinia, Crab, Pangolin, and Pangoro.
 
 # APIs
 
@@ -57,12 +57,12 @@ A server that provides various data related to Darwinia.
 # 0. set env to correct value in the dockerfile
 
 # 1. build the docker image
-docker build . -t darwinia2dataserver
+docker build . -t darwinia-datahub
 
 # 3. run
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia2dataserver rake update_metadata_loop
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia2dataserver rake gen_data_loop
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia2dataserver rake update_goerli_pangolin2_messages
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia2dataserver rake update_pangolin2_goerli_messages
-docker run -it --rm -v "${PWD}":/usr/src/app -p 4567:4567 darwinia2dataserver ruby server.rb
+docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake update_metadata_loop
+docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake gen_data_loop
+docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake update_goerli_pangolin2_messages
+docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake update_pangolin2_goerli_messages
+docker run -it --rm -v "${PWD}":/usr/src/app -p 4567:4567 darwinia-datahub ruby server.rb
 ```
