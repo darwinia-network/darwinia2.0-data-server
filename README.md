@@ -43,26 +43,19 @@ A server that provides various data related to Darwinia, Crab, Pangolin, and Pan
    /crab/stat
    ```
 
-## Important Files
-
-- server.rb  
-  server which provide http api.
-
-- data.rb  
-  the `get_data()` function in this file is to get the newest data.
-
 ## Docker
 
+### prepare a .env with:
+
 ```bash
-# 0. set env to correct value in the dockerfile
+GOERLI_ENDPOINT=https://eth-goerli.g.alchemy.com/v2/<your-api-key>
+PANGOLIN_ENDPOINT=https://pangolin-rpc.darwinia.network
+# get it from https://www.mongodb.com/cloud
+MONGODB_URI==mongodb+srv://<username>:<password>@<your-cluster-url>/goerli_pangolin?retryWrites=true&w=majority
+```
 
-# 1. build the docker image
-docker build . -t darwinia-datahub
+### run
 
-# 3. run
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake update_metadata_loop
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake gen_data_loop
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake update_goerli_pangolin2_messages
-docker run -it --rm -v "${PWD}":/usr/src/app darwinia-datahub rake update_pangolin2_goerli_messages
-docker run -it --rm -v "${PWD}":/usr/src/app -p 4567:4567 darwinia-datahub ruby server.rb
+```bash
+docker-compose up
 ```
