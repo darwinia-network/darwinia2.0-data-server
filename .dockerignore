@@ -1,5 +1,5 @@
 /nohup.out
-data.json
+/data/*.json
 node_modules
 .env
 package.json

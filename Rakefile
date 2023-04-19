@@ -1,39 +1,56 @@
 require "scale_rb"
 require "./src/utils"
-require "./src/stat"
+require "./src/supplies"
+require "./src/metadata"
 require "./src/track-goerli"
 require "./src/track-pangolin"
 require "./config/config.rb"
 config = get_config
 
-task default: %w[gen_data_loop]
+task default: %w[gen_supplies_data_loop]
 
-desc "Generate the statistic data"
-task :gen_data do
-  generate_crab_data
-end
-
-desc "Generate the statistic data loop"
-task :gen_data_loop do
-  loop_do { generate_crab_data }
-end
-
-desc "Update metadata"
-task :update_metadata do
-  update_crab_metadata
-end
-
-desc "Update metadata loop"
 task :update_metadata_loop do
-  loop_do { update_crab_metadata }
+  loop_do do
+    Rake::Task["update_crab_metadata"].invoke
+    Rake::Task["update_pangolin_metadata"].invoke
+  end
 end
 
-desc "Update Goerli > Pangolin2 Messages"
-task :update_goerli_pangolin2_messages do
+task :gen_supplies_data_loop do
+  loop_do { Rake::Task["gen_crab_supplies_data"].invoke }
+end
+
+##########################################
+# Crab
+##########################################
+task :gen_crab_supplies_data do
+  crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
+  crab_rpc = config[:crab_rpc]
+  generate_supplies("crab", crab_rpc, crab_metadata)
+end
+
+task :update_crab_metadata do
+  crab_rpc = config[:crab_rpc]
+  crab_metadata_path = config[:metadata][:crab]
+  update_metadata("crab", crab_rpc, crab_metadata_path)
+end
+
+##########################################
+# Pangolin
+##########################################
+task :update_pangolin_metadata do
+  pangolin_rpc = config[:pangolin_rpc]
+  pangolin_metadata_path = config[:metadata][:pangolin]
+  update_metadata("pangolin", pangolin_rpc, pangolin_metadata_path)
+end
+
+##########################################
+# Goerli <> pangolin
+##########################################
+task :update_goerli_pangolin_messages do
   track_goerli
 end
 
-desc "Update Pangolin2 > Goerli Messages"
-task :update_pangolin2_goerli_messages do
+task :update_pangolin_goerli_messages do
   track_pangolin
 end

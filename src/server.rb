@@ -1,47 +1,72 @@
 require "sinatra"
 require "scale_rb"
 require "yaml"
-require_relative "./utils"
-require_relative "../config/config.rb"
-config = get_config
-
 require "eth"
 require "json"
 include Eth
+
+require_relative "../config/config.rb"
+require_relative "./utils"
+require_relative "./storage"
+
+config = get_config
 
 get "/" do
   "Hello Darwinia!"
 end
 
-get "/pangolin/rpc/:method" do
-  puts config[:pangolin_rpc]
-  client = Eth::Client::Http.new(config[:pangolin_rpc])
-
-  content_type :json
-  # client.eth_block_number().to_json
-  client.send(:eth_block_number).to_json
-end
-
-get "/crab/stat" do
-  result = File.read("./data/data.json")
+##############################################################################
+# Darwinia
+##############################################################################
+get "/supply/ring" do
+  result = File.read("./darwinia-supplies.json")
   result = JSON.parse(result)
 
-  t_list = %w[
-    crab_reserved_in_staking
-    ckton_reserved_in_staking
-    crab_in_deposit
-  ]
-  if params["t"] && t_list.include?(params["t"])
+  if params["t"]
     content_type :text
-    return result[params["t"]].to_s
+    t = to_camel(params["t"])
+    if %w[totalSupply circulatingSupply maxSupply].include?(t)
+      return result["ringSupplies"][t].to_s
+    end
   end
 
+  content_type :json
+  { code: 0, data: result["ringSupplies"] }.to_json
+end
+
+get "/supply/kton" do
+  result = File.read("./darwinia-supplies.json")
+  result = JSON.parse(result)
+
+  if params["t"]
+    content_type :text
+    t = to_camel(params["t"])
+    if %w[totalSupply circulatingSupply maxSupply].include?(t)
+      return result["ktonSupplies"][t].to_s
+    end
+  end
+
+  content_type :json
+  { code: 0, data: result["ktonSupplies"] }.to_json
+end
+
+get "/seilppuswithbalances" do
+  content_type :json
+  File.read("./darwinia-supplies.json")
+end
+
+##############################################################################
+# Crab
+##############################################################################
+get "/crab/supplies" do
+  result = File.read("./data/crab-supplies.json")
+  result = JSON.parse(result)
   content_type :json
   { code: 0, data: result }.to_json
 end
 
 get "/crab/metadata" do
-  metadata = JSON.parse(File.read(config[:metadata][:crab2]))
+  metadata = JSON.parse(File.read(config[:metadata][:crab]))
 
   content_type :json
   metadata.to_json
@@ -75,7 +100,7 @@ get "/pangolin/templates/:filename" do
   content_type :yaml
 
   # check the file exists, and then render with 404
-  file = File.join(__dir__, "templates", "#{params[:filename]}")
+  file = File.join("./templates", "#{params[:filename]}")
   return 404 unless File.exist? file
   File.read(file)
 end
@@ -88,7 +113,7 @@ get "/pangolin/templates" do
 end
 
 post "/pangolin/versioned_xcm" do
-  metadata = JSON.parse(File.read(config[:metadata][:pangolin2]))
+  metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
   registry = Metadata.build_registry(metadata)
 
   # Find portable type id of VersionedXcm.
@@ -97,7 +122,7 @@ post "/pangolin/versioned_xcm" do
   versioned_xcm_type_id = call_type._get(:fields).first._get(:type)
 
   # encode the value from request body
-  value = JSON.parse(YAML.load(request.body.read).to_json)
+  value = JSON.parse(YAML.load(request.body.read, aliases: true).to_json)
   bytes = PortableCodec.encode(versioned_xcm_type_id, value, registry)
 
   content_type :json
@@ -150,7 +175,7 @@ post "/pangolin/encode_transact_call" do
     ],
   }
 
-  metadata = JSON.parse(File.read(config[:metadata][:pangolin2]))
+  metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
   encoded_call = Metadata.encode_call(transact_call, metadata)
   content_type :json
   render_json encoded_call.to_hex
@@ -174,27 +199,17 @@ end
 # /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
 # /crab/assets/account/0x1234 -> error
 get "/crab/:pallet_name/:storage_name/?:key1?/?:key2?" do
-  pallet_name = to_camel params[:pallet_name]
-  storage_name = to_camel params[:storage_name]
+  crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
+  crab_rpc = config[:crab_rpc]
 
-  puts "#{pallet_name}##{storage_name}(#{[params[:key1], params[:key2]].compact.join(", ")})"
-
-  metadata = JSON.parse(File.read(config[:metadata][:crab2]))
-
-  if pallet_name == "AccountMigration" && params[:key1] &&
-       params[:key1].start_with?("5")
-    params[:key1] = "0x#{Address.decode(params[:key1], 42, true)}"
-  end
-
-  key =
-    [params[:key1], params[:key2]].compact.map { |part_of_key| c(part_of_key) }
   storage =
-    ScaleRb::HttpClient.get_storage2(
-      config[:crab_rpc],
-      pallet_name,
-      storage_name,
-      key,
-      metadata,
+    get_storage(
+      crab_rpc,
+      crab_metadata,
+      params[:pallet_name],
+      params[:storage_name],
+      params[:key1],
+      params[:key2],
     )
 
   content_type :json

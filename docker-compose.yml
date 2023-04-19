@@ -1,27 +1,27 @@
 version: "3"
 services:
-  update_metadata_loop:
+  update_metadata:
     build: .
     env_file:
       - .env
     command: rake update_metadata_loop
-  gen_data_loop:
+  gen_supplies_data:
     build: .
     env_file:
       - .env
-    command: rake gen_data_loop
+    command: rake gen_supplies_data_loop
     volumes:
-      - ~/data:/usr/src/app/data
-  update_goerli_pangolin2_messages:
+      - ./data:/usr/src/app/data
+  update_goerli_pangolin_messages:
     build: .
     env_file:
       - .env
-    command: rake update_goerli_pangolin2_messages
-  update_pangolin2_goerli_messages:
+    command: rake update_goerli_pangolin_messages
+  update_pangolin_goerli_messages:
     build: .
     env_file:
       - .env
-    command: rake update_pangolin2_goerli_messages
+    command: rake update_pangolin_goerli_messages
   server:
     build: .
     env_file:
@@ -30,4 +30,4 @@ services:
     ports:
       - "4567:4567"
     volumes:
-      - ~/data:/usr/src/app/data
+      - ./data:/usr/src/app/data
