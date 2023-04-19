@@ -1,5 +1,28 @@
 require "scale_rb"
 
+# https://support.polkadot.network/support/solutions/articles/65000182717-account-balances-and-locks
+
+# # RING in an account
+#
+# ## RING in an migrated account
+#
+# total: free + reserved == transferrable + locked + reserved
+#   transferrable = free - locked
+#   locked = balances.locks
+#   reserved = system.accounts.data.reserved
+#
+# extra
+#   * in staking(without deposits) = darwiniaStaking.stakedRing + darwiniaStaking.unstakingRing
+#   * in deposit = deposit.deposits
+#
+# ## RING in an unmigrated account
+#
+# transferrable = accounts[0x32].free - accounts[0x32].locked
+# locked = vesting + ...
+
+# # How to calc circulating supply?
+# darwiniaStaking.ringPool = darwiniaStaking.stakedRing + RING in darwiniaStaking.stakedDeposits
+
 # ## Storage
 # -------------------------------
 #
@@ -11,7 +34,7 @@ require "scale_rb"
 #   sufficients: 1
 #   data: {
 #     free: 14,512,288,096,158,638,790,418
-#     reserved: 200,135,400,000,000,000,000 // name
+#     reserved: 200,135,400,000,000,000,000 // my onchain name
 #     miscFrozen: 13,767,198,376,240,536,966,688 // gov + vesting
 #     feeFrozen: 13,767,198,376,240,536,966,688
 #   }
@@ -172,3 +195,25 @@ def get_data(crab_metadata, crab_rpc)
     circulating_supply: circulating_supply,
   }
 end
+
+# require_relative "../config/config.rb"
+# config = get_config
+# crab_metadata = JSON.parse(File.read(config[:metadata][:crab2]))
+# crab_rpc = config[:crab_rpc]
+# unmigrated_accounts =
+#   ScaleRb::HttpClient.get_storage2(
+#     crab_rpc,
+#     "AccountMigration",
+#     "Accounts",
+#     nil,
+#     crab_metadata,
+#   )
+
+# unmigrated_accounts_reserved_sum =
+#   unmigrated_accounts.reduce(0) do |sum, account|
+#     sum + account[:storage][:data][:reserved]
+#   end
+# unmigrated_accounts_reserved_sum =
+#   (unmigrated_accounts_reserved_sum / 10**18).floor
+
+# p unmigrated_accounts_reserved_sum

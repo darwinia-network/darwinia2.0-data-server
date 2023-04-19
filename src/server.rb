@@ -5,8 +5,21 @@ require_relative "./utils"
 require_relative "../config/config.rb"
 config = get_config
 
+require "eth"
+require "json"
+include Eth
+
 get "/" do
   "Hello Darwinia!"
+end
+
+get "/pangolin/rpc/:method" do
+  puts config[:pangolin_rpc]
+  client = Eth::Client::Http.new(config[:pangolin_rpc])
+
+  content_type :json
+  # client.eth_block_number().to_json
+  client.send(:eth_block_number).to_json
 end
 
 get "/crab/stat" do
