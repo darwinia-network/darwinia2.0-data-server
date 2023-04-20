@@ -8,6 +8,7 @@ include Eth
 require_relative "../config/config.rb"
 require_relative "./utils"
 require_relative "./storage"
+require_relative "./account"
 
 config = get_config
 
@@ -58,6 +59,16 @@ end
 ##############################################################################
 # Crab
 ##############################################################################
+get "/crab/accounts/:address" do
+  metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
+  rpc = config[:crab_rpc]
+
+  info = get_account_info(rpc, metadata, params[:address])
+
+  content_type :json
+  render_json info
+end
+
 get "/crab/supplies" do
   result = File.read("./data/crab-supplies.json")
   result = JSON.parse(result)
