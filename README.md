@@ -65,10 +65,15 @@ Circulating Supply: Total Supply - Reserved
 ### prepare a .env with:
 
 ```bash
+# alchemy nodes has been tested
+ETHEREUM_ENDPOINT=https://eth-mainnet.g.alchemy.com/v2/<your-api-key>
 GOERLI_ENDPOINT=https://eth-goerli.g.alchemy.com/v2/<your-api-key>
-PANGOLIN_ENDPOINT=https://pangolin-rpc.darwinia.network
+# darwinia nodes
+DARWINIA_ENDPOINT=http://g1.dev.darwinia.network:10000
 CRAB_ENDPOINT=https://crab-rpc.darwinia.network
-MONGODB_URI==mongodb+srv://<username>:<password>@<your-cluster-url>/goerli_pangolin?retryWrites=true&w=majority
+PANGOLIN_ENDPOINT=https://pangolin-rpc.darwinia.network
+# mongodb
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/goerli_pangolin?retryWrites=true&w=majority
 ```
 
 ### run
