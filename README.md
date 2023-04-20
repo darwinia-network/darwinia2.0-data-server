@@ -43,6 +43,19 @@ A server that provides various data related to Darwinia, Crab, Pangolin, and Pan
    /crab/stat
    ```
 
+## RING Supply
+
+Total Supply: Balances.totalInssurance
+Circulating Supply: Total Supply - Reserved
+
+### Reserved
+
+1. Reserve on Darwinia Chain: https://darwinia.subscan.io/account/2rNgQRqCQ6U9UHHvjVBfvo22sJRLD5md7TcXDrZSVfxetx1J
+2. Ecosystem Development Fund: https://etherscan.io/address/0xfa4fe04f69f87859fcb31df3b9469f4e6447921c
+3. Treasury:
+   1. Darwinia1 Account: https://darwinia.subscan.io/account/2qeMxq616BhswywHP1MzwCEKX1ibEQ4DKJw95NppvWxy2Fka
+   2. Darwinia2 Account: 0x6d6f646c64612f74727372790000000000000000
+
 ## RINGS of an account
 
 <img width="878" alt="DARWINI_RING" src="https://user-images.githubusercontent.com/1608576/232960651-4fba7c92-4c8f-4420-be36-1cc4d14974bc.png">

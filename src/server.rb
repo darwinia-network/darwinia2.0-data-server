@@ -16,74 +16,6 @@ get "/" do
   "Hello Darwinia!"
 end
 
-get "/:network/metadata" do
-  network = params[:network].downcase
-  if not %w[darwinia crab pangolin].include?(network)
-    raise_with 404,
-               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
-  end
-  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
-
-  content_type :json
-  metadata.to_json
-end
-
-get "/:network/accounts/:address" do
-  network = network = params[:network].downcase
-  if not %w[darwinia crab pangolin].include?(network)
-    raise_with 404,
-               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
-  end
-
-  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
-  rpc = config["#{network}_rpc".to_sym]
-
-  info = get_account_info(rpc, metadata, params[:address])
-
-  content_type :json
-  render_json info
-end
-
-# Example:
-# key is empty:
-# /crab/timestamp/now
-# /crab/system/number
-# /crab/darwinia_staking/reward_points
-# /crab/vesting/vesting/
-# /crab/deposit/deposits
-#
-# key has one parts: key1
-# /crab/deposit/deposits/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
-# /crab/system/block_hash/0
-# /crab/bridgeDarwiniaMessages/inboundLanes/0x00000000
-#
-# key has two parts: key1 & key2
-# /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
-# /crab/assets/account/0x1234 -> error
-get "/:network/:pallet_name/:storage_name/?:key1?/?:key2?" do
-  network = network = params[:network].downcase
-  if not %w[darwinia crab pangolin].include?(network)
-    raise_with 404,
-               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
-  end
-
-  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
-  rpc = config["#{network}_rpc".to_sym]
-
-  storage =
-    get_storage(
-      rpc,
-      metadata,
-      params[:pallet_name],
-      params[:storage_name],
-      params[:key1],
-      params[:key2],
-    )
-
-  content_type :json
-  render_json storage
-end
-
 ##############################################################################
 # Darwinia & Crab's supplies
 ##############################################################################
@@ -92,7 +24,7 @@ get "/supply/ring" do
   if not %w[darwinia crab].include?(network)
     raise_with(
       404,
-      "network not found, only `darwinia` and `crab` are supported",
+      "network #{network} not found, only `darwinia` and `crab` are supported",
     )
   end
 
@@ -116,7 +48,7 @@ get "/supply/kton" do
   if not %w[darwinia crab].include?(network)
     raise_with(
       404,
-      "network not found, only `darwinia` and `crab` are supported",
+      "network #{network} not found, only `darwinia` and `crab` are supported",
     )
   end
 
@@ -140,7 +72,7 @@ get "/seilppuswithbalances" do
   if not %w[darwinia crab].include?(network)
     raise_with(
       404,
-      "network not found, only `darwinia` and `crab` are supported",
+      "network #{network} not found, only `darwinia` and `crab` are supported",
     )
   end
 
@@ -215,8 +147,9 @@ post "/pangolin/encode_transact_call" do
   ethereum_contract = params[:ethereum_contract][2..]
   ethereum_call = params[:ethereum_call][2..]
   pangolin_endpoint =
-    params[:pangolin_endpoint].strip ||
-      "0xB822E12dD225FBef8763325Aaf6F2cbCFe331c83"
+    (
+      params[:pangolin_endpoint] || "0xB822E12dD225FBef8763325Aaf6F2cbCFe331c83"
+    ).strip
 
   puts "pangolin_endpoint: #{pangolin_endpoint}"
   # get market fee from pangolin endpoint
@@ -259,8 +192,76 @@ post "/pangolin/encode_transact_call" do
 
   metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
   encoded_call = Metadata.encode_call(transact_call, metadata)
-  content_type :json
   render_json encoded_call.to_hex
+end
+
+##############################################################################
+# General
+##############################################################################
+get "/:network/metadata" do
+  network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
+
+  content_type :json
+  metadata.to_json
+end
+
+get "/:network/accounts/:address" do
+  network = network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+
+  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
+  rpc = config["#{network}_rpc".to_sym]
+
+  info = get_account_info(rpc, metadata, params[:address])
+
+  render_json info
+end
+
+# Example:
+# key is empty:
+# /crab/timestamp/now
+# /crab/system/number
+# /crab/darwinia_staking/reward_points
+# /crab/vesting/vesting/
+# /crab/deposit/deposits
+#
+# key has one parts: key1
+# /crab/deposit/deposits/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
+# /crab/system/block_hash/0
+# /crab/bridgeDarwiniaMessages/inboundLanes/0x00000000
+#
+# key has two parts: key1 & key2
+# /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
+# /crab/assets/account/0x1234 -> error
+get "/:network/:pallet_name/:storage_name/?:key1?/?:key2?" do
+  network = network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+
+  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
+  rpc = config["#{network}_rpc".to_sym]
+
+  storage =
+    get_storage(
+      rpc,
+      metadata,
+      params[:pallet_name],
+      params[:storage_name],
+      params[:key1],
+      params[:key2],
+    )
+
+  render_json storage
 end
 
 ##############################################################################

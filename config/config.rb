@@ -1,6 +1,7 @@
 require "dotenv/load"
 def get_config
   {
+    ethereum_rpc: "#{ENV["ETHEREUM_ENDPOINT"]}",
     darwinia_rpc: "#{ENV["DARWINIA_ENDPOINT"]}",
     crab_rpc: "#{ENV["CRAB_ENDPOINT"]}",
     pangolin_rpc: "#{ENV["PANGOLIN_ENDPOINT"]}",

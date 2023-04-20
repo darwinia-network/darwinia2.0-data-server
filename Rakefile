@@ -18,19 +18,17 @@ task :update_metadata_loop do
 end
 
 task :gen_supplies_data_loop do
-  loop_do do
-    Rake::Task["gen_darwinia_supplies_data"].invoke
-    Rake::Task["gen_crab_supplies_data"].invoke
-  end
+  loop_do { Rake::Task["gen_darwinia_supplies_data"].invoke }
 end
 
 ##########################################
 # Darwinia
 ##########################################
 task :gen_darwinia_supplies_data do
-  darwinia_metadata = JSON.parse(File.read(config[:metadata][:darwinia]))
+  ethereum_rpc = config[:ethereum_rpc]
   darwinia_rpc = config[:darwinia_rpc]
-  generate_supplies("darwinia", darwinia_rpc, darwinia_metadata)
+  darwinia_metadata = JSON.parse(File.read(config[:metadata][:darwinia]))
+  generate_supplies("darwinia", ethereum_rpc, darwinia_rpc, darwinia_metadata)
 end
 
 task :update_darwinia_metadata do
@@ -42,12 +40,6 @@ end
 ##########################################
 # Crab
 ##########################################
-task :gen_crab_supplies_data do
-  crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
-  crab_rpc = config[:crab_rpc]
-  generate_supplies("crab", crab_rpc, crab_metadata)
-end
-
 task :update_crab_metadata do
   crab_rpc = config[:crab_rpc]
   crab_metadata_path = config[:metadata][:crab]
