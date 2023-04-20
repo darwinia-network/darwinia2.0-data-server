@@ -47,7 +47,6 @@ A server that provides various data related to Darwinia, Crab, Pangolin, and Pan
 
 <img width="878" alt="DARWINI_RING" src="https://user-images.githubusercontent.com/1608576/232960651-4fba7c92-4c8f-4420-be36-1cc4d14974bc.png">
 
-
 ## Docker
 
 ### prepare a .env with:
@@ -56,7 +55,6 @@ A server that provides various data related to Darwinia, Crab, Pangolin, and Pan
 GOERLI_ENDPOINT=https://eth-goerli.g.alchemy.com/v2/<your-api-key>
 PANGOLIN_ENDPOINT=https://pangolin-rpc.darwinia.network
 CRAB_ENDPOINT=https://crab-rpc.darwinia.network
-# you can get a free mongodb from https://www.mongodb.com/cloud
 MONGODB_URI==mongodb+srv://<username>:<password>@<your-cluster-url>/goerli_pangolin?retryWrites=true&w=majority
 ```
 
