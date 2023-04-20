@@ -8,8 +8,7 @@ def to_camel(str)
 end
 
 def to_pascal(str)
-  splits = str.split("_")
-  splits[0..].collect(&:capitalize).join
+  str.split("_").collect(&:capitalize).join
 end
 
 # convert key
