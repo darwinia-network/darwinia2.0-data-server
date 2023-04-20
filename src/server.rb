@@ -18,6 +18,10 @@ end
 
 get "/:network/metadata" do
   network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
   metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
 
   content_type :json
@@ -42,6 +46,10 @@ end
 # /crab/assets/account/0x1234 -> error
 get "/:network/:pallet_name/:storage_name/?:key1?/?:key2?" do
   network = network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
 
   metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
   rpc = config["#{network}_rpc".to_sym]
