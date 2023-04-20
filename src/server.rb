@@ -28,6 +28,22 @@ get "/:network/metadata" do
   metadata.to_json
 end
 
+get "/:network/accounts/:address" do
+  network = network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+
+  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
+  rpc = config["#{network}_rpc".to_sym]
+
+  info = get_account_info(rpc, metadata, params[:address])
+
+  content_type :json
+  render_json info
+end
+
 # Example:
 # key is empty:
 # /crab/timestamp/now
@@ -135,23 +151,6 @@ end
 ##############################################################################
 # Crab
 ##############################################################################
-get "/crab/accounts/:address" do
-  metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
-  rpc = config[:crab_rpc]
-
-  info = get_account_info(rpc, metadata, params[:address])
-
-  content_type :json
-  render_json info
-end
-
-get "/crab/supplies" do
-  result = File.read("./data/crab-supplies.json")
-  result = JSON.parse(result)
-  content_type :json
-  { code: 0, data: result }.to_json
-end
-
 get "/crab/address/:address" do
   content_type :json
   # address must presented
