@@ -1,10 +1,15 @@
 def to_camel(str)
   if str.include?("_")
     splits = str.split("_")
-    splits[0..].collect(&:capitalize).join
+    splits[0] + splits[1..].collect(&:capitalize).join
   else
-    str[0].upcase + str[1..]
+    str[0].downcase + str[1..]
   end
+end
+
+def to_pascal(str)
+  splits = str.split("_")
+  splits[0..].collect(&:capitalize).join
 end
 
 # convert key
@@ -42,5 +47,6 @@ def loop_do(sleep_time = 60 * 5)
   rescue StandardError => e
     puts e.message
     puts e.backtrace.join("\n")
+    sleep sleep_time
   end
 end

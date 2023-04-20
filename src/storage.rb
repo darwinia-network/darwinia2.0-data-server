@@ -2,8 +2,8 @@ require "scale_rb"
 require_relative "utils"
 
 def get_storage(rpc, metadata, pallet_name, storage_name, key_part1, key_part2)
-  pallet_name = to_camel pallet_name
-  storage_name = to_camel storage_name
+  pallet_name = to_pascal pallet_name
+  storage_name = to_pascal storage_name
 
   puts "#{pallet_name}.#{storage_name}(#{[key_part1, key_part2].compact.join(", ")})"
 

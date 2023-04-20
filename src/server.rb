@@ -20,7 +20,7 @@ end
 # Darwinia
 ##############################################################################
 get "/supply/ring" do
-  result = File.read("./darwinia-supplies.json")
+  result = File.read("./data/darwinia-supplies.json")
   result = JSON.parse(result)
 
   if params["t"]
@@ -36,7 +36,7 @@ get "/supply/ring" do
 end
 
 get "/supply/kton" do
-  result = File.read("./darwinia-supplies.json")
+  result = File.read("./data/darwinia-supplies.json")
   result = JSON.parse(result)
 
   if params["t"]
@@ -53,7 +53,7 @@ end
 
 get "/seilppuswithbalances" do
   content_type :json
-  File.read("./darwinia-supplies.json")
+  File.read("./data/darwinia-supplies.json")
 end
 
 ##############################################################################
@@ -107,6 +107,44 @@ get "/crab/address/:address" do
   end
 end
 
+# write a action to get substrate pallets data
+# Example:
+# key is empty:
+# /crab/timestamp/now
+# /crab/system/number
+# /crab/darwinia_staking/reward_points
+# /crab/vesting/vesting/
+# /crab/deposit/deposits
+#
+# key has one parts: key1
+# /crab/deposit/deposits/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
+# /crab/system/block_hash/0
+# /crab/bridgeDarwiniaMessages/inboundLanes/0x00000000
+#
+# key has two parts: key1 & key2
+# /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
+# /crab/assets/account/0x1234 -> error
+get "/crab/:pallet_name/:storage_name/?:key1?/?:key2?" do
+  crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
+  crab_rpc = config[:crab_rpc]
+
+  storage =
+    get_storage(
+      crab_rpc,
+      crab_metadata,
+      params[:pallet_name],
+      params[:storage_name],
+      params[:key1],
+      params[:key2],
+    )
+
+  content_type :json
+  render_json storage
+end
+
+##############################################################################
+# Pangolin
+##############################################################################
 get "/pangolin/templates/:filename" do
   content_type :yaml
 
@@ -190,41 +228,6 @@ post "/pangolin/encode_transact_call" do
   encoded_call = Metadata.encode_call(transact_call, metadata)
   content_type :json
   render_json encoded_call.to_hex
-end
-
-# write a action to get substrate pallets data
-# Example:
-# key is empty:
-# /crab/timestamp/now
-# /crab/system/number
-# /crab/darwinia_staking/reward_points
-# /crab/vesting/vesting/
-# /crab/deposit/deposits
-#
-# key has one parts: key1
-# /crab/deposit/deposits/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
-# /crab/system/block_hash/0
-# /crab/bridgeDarwiniaMessages/inboundLanes/0x00000000
-#
-# key has two parts: key1 & key2
-# /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
-# /crab/assets/account/0x1234 -> error
-get "/crab/:pallet_name/:storage_name/?:key1?/?:key2?" do
-  crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
-  crab_rpc = config[:crab_rpc]
-
-  storage =
-    get_storage(
-      crab_rpc,
-      crab_metadata,
-      params[:pallet_name],
-      params[:storage_name],
-      params[:key1],
-      params[:key2],
-    )
-
-  content_type :json
-  render_json storage
 end
 
 error do |e|
