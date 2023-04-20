@@ -55,7 +55,8 @@ A server that provides various data related to Darwinia, Crab, Pangolin, and Pan
 ```bash
 GOERLI_ENDPOINT=https://eth-goerli.g.alchemy.com/v2/<your-api-key>
 PANGOLIN_ENDPOINT=https://pangolin-rpc.darwinia.network
-# get it from https://www.mongodb.com/cloud
+CRAB_ENDPOINT=https://crab-rpc.darwinia.network
+# you can get a free mongodb from https://www.mongodb.com/cloud
 MONGODB_URI==mongodb+srv://<username>:<password>@<your-cluster-url>/goerli_pangolin?retryWrites=true&w=majority
 ```
 
