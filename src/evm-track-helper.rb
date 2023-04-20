@@ -250,7 +250,7 @@ class EvmTrackHelper
           )
         message = {
           nonce: args[:nonce],
-          status: "accepted",
+          status: 0,
           accepted_at: timestamp,
           accepted_tx: tx_hash,
           from: args[:source],
@@ -268,7 +268,7 @@ class EvmTrackHelper
           )
         message = {
           nonce: args[:nonce],
-          status: "dispatched",
+          status: 1,
           dispatch_result: args[:result],
           dispatched_at: timestamp,
           dispatched_tx: tx_hash,
@@ -285,7 +285,7 @@ class EvmTrackHelper
         (args[:begin]..args[:end]).each do |nonce|
           message = {
             nonce: nonce,
-            status: "delivered",
+            status: 2,
             delivered_at: timestamp,
             delivered_tx: tx_hash,
           }

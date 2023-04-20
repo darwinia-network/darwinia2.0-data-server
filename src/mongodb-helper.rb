@@ -28,13 +28,18 @@ module MongodbHelper
       db.update_one(query, { "$set" => set })
     end
 
-    def save_or_update_message(message)
+    def save_or_update_message(attrs)
       db = client[:messages]
-      message_id = { direction: message[:direction], nonce: message[:nonce] }
-      if find_message(message_id)
-        update_message(message_id, message)
+      message_id = { direction: attrs[:direction], nonce: attrs[:nonce] }
+      message = find_message(message_id)
+      if message
+        new_message = message.merge(attrs)
+        if (attrs[:status] < message[:status]) # old status is higher
+          new_message[:status] = message[:status] # keep the old status
+        end
+        update_message(message_id, new_message)
       else
-        save_message(message)
+        save_message(attrs)
       end
     end
 
