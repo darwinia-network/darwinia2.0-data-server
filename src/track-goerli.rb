@@ -43,7 +43,7 @@ def track_goerli
     when "MessageDispatched"
       message = { direction: 1 }.merge(data)
       MongodbHelper.save_or_update_message(message)
-    when "MessageDelivered"
+    when "MessagesDelivered"
       message = { direction: 0 }.merge(data)
       MongodbHelper.save_or_update_message(message)
     end
