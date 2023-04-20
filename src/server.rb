@@ -16,11 +16,71 @@ get "/" do
   "Hello Darwinia!"
 end
 
+get "/:network/metadata" do
+  network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
+
+  content_type :json
+  metadata.to_json
+end
+
+# Example:
+# key is empty:
+# /crab/timestamp/now
+# /crab/system/number
+# /crab/darwinia_staking/reward_points
+# /crab/vesting/vesting/
+# /crab/deposit/deposits
+#
+# key has one parts: key1
+# /crab/deposit/deposits/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
+# /crab/system/block_hash/0
+# /crab/bridgeDarwiniaMessages/inboundLanes/0x00000000
+#
+# key has two parts: key1 & key2
+# /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
+# /crab/assets/account/0x1234 -> error
+get "/:network/:pallet_name/:storage_name/?:key1?/?:key2?" do
+  network = network = params[:network].downcase
+  if not %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+
+  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
+  rpc = config["#{network}_rpc".to_sym]
+
+  storage =
+    get_storage(
+      rpc,
+      metadata,
+      params[:pallet_name],
+      params[:storage_name],
+      params[:key1],
+      params[:key2],
+    )
+
+  content_type :json
+  render_json storage
+end
+
 ##############################################################################
-# Darwinia
+# Darwinia & Crab's supplies
 ##############################################################################
 get "/supply/ring" do
-  result = File.read("./darwinia-supplies.json")
+  network = (params["network"] ||= "darwinia").downcase
+  if not %w[darwinia crab].include?(network)
+    raise_with(
+      404,
+      "network not found, only `darwinia` and `crab` are supported",
+    )
+  end
+
+  result = File.read("./data/#{network}-supplies.json")
   result = JSON.parse(result)
 
   if params["t"]
@@ -36,7 +96,15 @@ get "/supply/ring" do
 end
 
 get "/supply/kton" do
-  result = File.read("./darwinia-supplies.json")
+  network = (params["network"] ||= "darwinia").downcase
+  if not %w[darwinia crab].include?(network)
+    raise_with(
+      404,
+      "network not found, only `darwinia` and `crab` are supported",
+    )
+  end
+
+  result = File.read("./data/#{network}-supplies.json")
   result = JSON.parse(result)
 
   if params["t"]
@@ -52,8 +120,16 @@ get "/supply/kton" do
 end
 
 get "/seilppuswithbalances" do
+  network = (params["network"] ||= "darwinia").downcase
+  if not %w[darwinia crab].include?(network)
+    raise_with(
+      404,
+      "network not found, only `darwinia` and `crab` are supported",
+    )
+  end
+
   content_type :json
-  File.read("./darwinia-supplies.json")
+  File.read("./data/#{network}-supplies.json")
 end
 
 ##############################################################################
@@ -74,13 +150,6 @@ get "/crab/supplies" do
   result = JSON.parse(result)
   content_type :json
   { code: 0, data: result }.to_json
-end
-
-get "/crab/metadata" do
-  metadata = JSON.parse(File.read(config[:metadata][:crab]))
-
-  content_type :json
-  metadata.to_json
 end
 
 get "/crab/address/:address" do
@@ -107,6 +176,9 @@ get "/crab/address/:address" do
   end
 end
 
+##############################################################################
+# Pangolin
+##############################################################################
 get "/pangolin/templates/:filename" do
   content_type :yaml
 
@@ -192,39 +264,13 @@ post "/pangolin/encode_transact_call" do
   render_json encoded_call.to_hex
 end
 
-# write a action to get substrate pallets data
-# Example:
-# key is empty:
-# /crab/timestamp/now
-# /crab/system/number
-# /crab/darwinia_staking/reward_points
-# /crab/vesting/vesting/
-# /crab/deposit/deposits
-#
-# key has one parts: key1
-# /crab/deposit/deposits/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
-# /crab/system/block_hash/0
-# /crab/bridgeDarwiniaMessages/inboundLanes/0x00000000
-#
-# key has two parts: key1 & key2
-# /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
-# /crab/assets/account/0x1234 -> error
-get "/crab/:pallet_name/:storage_name/?:key1?/?:key2?" do
-  crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
-  crab_rpc = config[:crab_rpc]
-
-  storage =
-    get_storage(
-      crab_rpc,
-      crab_metadata,
-      params[:pallet_name],
-      params[:storage_name],
-      params[:key1],
-      params[:key2],
-    )
-
+##############################################################################
+# Exception Handling
+##############################################################################
+def raise_with(status, message)
   content_type :json
-  render_json storage
+  ret = { code: 1, message: "#{message}" }.to_json
+  halt status, ret
 end
 
 error do |e|

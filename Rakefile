@@ -11,13 +11,32 @@ task default: %w[gen_supplies_data_loop]
 
 task :update_metadata_loop do
   loop_do do
+    Rake::Task["update_darwinia_metadata"].invoke
     Rake::Task["update_crab_metadata"].invoke
     Rake::Task["update_pangolin_metadata"].invoke
   end
 end
 
 task :gen_supplies_data_loop do
-  loop_do { Rake::Task["gen_crab_supplies_data"].invoke }
+  loop_do do
+    Rake::Task["gen_darwinia_supplies_data"].invoke
+    Rake::Task["gen_crab_supplies_data"].invoke
+  end
+end
+
+##########################################
+# Darwinia
+##########################################
+task :gen_darwinia_supplies_data do
+  darwinia_metadata = JSON.parse(File.read(config[:metadata][:darwinia]))
+  darwinia_rpc = config[:darwinia_rpc]
+  generate_supplies("darwinia", darwinia_rpc, darwinia_metadata)
+end
+
+task :update_darwinia_metadata do
+  darwinia_rpc = config[:darwinia_rpc]
+  darwinia_metadata_path = config[:metadata][:darwinia]
+  update_metadata("darwinia", darwinia_rpc, darwinia_metadata_path)
 end
 
 ##########################################
