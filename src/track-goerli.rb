@@ -10,8 +10,8 @@ def track_goerli
   # Prepare the contracts to track
   # --------------------------------------------------------
   contracts_to_track = [
-    "0x21D4A3c5390D098073598d30FD49d32F9d9E355E", # outbound lane
-    "0x5881f5CF92bf616fdD10eA82DF8f9e709EC5a81D", # inbound lane
+    "0x9B5010d562dDF969fbb85bC72222919B699b5F54", # outbound lane
+    "0x0F6e081B1054c59559Cf162e82503F3f560cA4AF", # inbound lane
   ]
 
   # Prepare how to persist the last tracked block

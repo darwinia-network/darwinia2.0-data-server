@@ -11,8 +11,8 @@ def track_pangolin
   # Prepare the contracts to track
   # --------------------------------------------------------
   contracts_to_track = [
-    "0xcF2A32c182A73D93fBa0C5e515e3C5ec7944a471", # outbound lane
-    "0x12224D83884009782F8F25fa709B33DEA6ad0fE7", # inbound lane
+    "0xAbd165DE531d26c229F9E43747a8d683eAD54C6c", # outbound lane
+    "0xB59a893f5115c1Ca737E36365302550074C32023", # inbound lane
   ]
 
   # Prepare how to persist the last tracked block
