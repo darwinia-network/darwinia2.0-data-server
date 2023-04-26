@@ -9,11 +9,13 @@ require_relative "./utils"
 def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   total_issuance = get_total_insurance(darwinia_rpc, metadata)
 
+  darwinia_client = Eth::Client::Http.new(darwinia_rpc)
+  ethereum_client = Eth::Client::Http.new(ethereum_rpc)
+  
   # reserved1: Reserve on Darwinia Chain
-  reserved1 = 389_331_255 # this is for RING, not CRAB
+  reserved1 = darwinia_client.eth_get_balance("0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284")["result"].to_i(16).to_f / 10**18 # this is for RING, not CRAB
 
   # reserved2: Ecosystem Development Fund
-  ethereum_client = Eth::Client::Http.new(ethereum_rpc)
   token_contract = "0x9469D013805bFfB7D3DEBe5E7839237e535ec483"
   fund_address = "0xfa4fe04f69f87859fcb31df3b9469f4e6447921c"
   data = "0x70a08231000000000000000000000000#{fund_address[2..]}"
@@ -23,15 +25,13 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
     ).to_f / 10**18
 
   # reserved3: Treasury
-  darwinia_client = Eth::Client::Http.new(darwinia_rpc)
   treasury_address = "0x6d6f646c64612f74727372790000000000000000"
   reserved3 =
-    darwinia_client.eth_get_balance(treasury_address)["result"].to_i(16).to_f /
-      10**18
+    darwinia_client.eth_get_balance(treasury_address)["result"].to_i(16).to_f / 10**18
 
   {
     totalSupply: total_issuance,
-    circulatingSupply: total_issuance - (reserved1 + reserved2 + reserved3),
+    circulatingSupply: total_issuance - (reserved1 + reserved2 + reserved3).to_i,
     maxSupply: 10_000_000_000,
   }
 end
