@@ -5,6 +5,7 @@ include Eth
 require_relative "supply/ring"
 require_relative "supply/kton"
 require_relative "./utils"
+require_relative "account"
 
 def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   total_issuance = get_total_insurance(darwinia_rpc, metadata)
@@ -13,7 +14,7 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   ethereum_client = Eth::Client::Http.new(ethereum_rpc)
   
   # reserved1: Reserve on Darwinia Chain
-  reserved1 = darwinia_client.eth_get_balance("0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284")["result"].to_i(16).to_f / 10**18 # this is for RING, not CRAB
+  reserved1 = get_account_info(darwinia_rpc, metadata, "0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284")[:ring].to_i
 
   # reserved2: Ecosystem Development Fund
   token_contract = "0x9469D013805bFfB7D3DEBe5E7839237e535ec483"
