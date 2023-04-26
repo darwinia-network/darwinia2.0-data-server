@@ -146,18 +146,19 @@ end
 post "/pangolin/encode_transact_call" do
   ethereum_contract = params[:ethereum_contract][2..]
   ethereum_call = params[:ethereum_call][2..]
-  pangolin_endpoint =
+  raise "pangolin_hub is null" params[:pangolin_hub].nil?
+  pangolin_hub =
     (
-      params[:pangolin_endpoint] || "0xB822E12dD225FBef8763325Aaf6F2cbCFe331c83"
+      params[:pangolin_hub]
     ).strip
 
-  puts "pangolin_endpoint: #{pangolin_endpoint}"
+  puts "pangolin_hub: #{pangolin_hub}"
   # get market fee from pangolin endpoint
   fee =
     ScaleRb::HttpClient.json_rpc_call(
       config[:pangolin_rpc],
       "eth_call",
-      { data: "0xddca3f43", gas: "0x5b8d80", to: pangolin_endpoint },
+      { data: "0xddca3f43", gas: "0x5b8d80", to: pangolin_hub },
       "latest",
     )
   fee = PortableCodec.u256(fee.to_i(16))
@@ -177,7 +178,7 @@ post "/pangolin/encode_transact_call" do
             V2: {
               gas_limit: PortableCodec.u256(600_000),
               action: {
-                Call: pangolin_endpoint.to_bytes,
+                Call: pangolin_hub.to_bytes,
               },
               value: fee,
               input: data_of_execute_on_ethereum.to_bytes,
