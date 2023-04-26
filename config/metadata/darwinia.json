@@ -51726,7 +51726,7 @@
             {
               "name": "BlockHashCount",
               "type": 4,
-              "value": "0x60090000",
+              "value": "0x00010000",
               "docs": [
                 " Maximum number of block number to block hash mappings to keep (oldest pruned first)."
               ]
@@ -51742,7 +51742,7 @@
             {
               "name": "Version",
               "type": 189,
-              "value": "0x2444617277696e6961325044617277696e69614f6666696369616c5275737400000000841700000000000034dd718d5cc53262d401000000df6acb689907609b0400000037e397fc7c91f5e40100000040fe3ad401f8959a06000000d2bc9897eed08f1503000000f78b278be53f454c02000000ab3c0572291feb8b01000000bc9d89904f5b923f0100000037c8bb1350a9a2a803000000f3ff14d5ab52705903000000ea93e3f16f3d696202000000582211f65bb14b8904000000e65b00e46cedd0aa020000000000000000",
+              "value": "0x2444617277696e6961325044617277696e69614f6666696369616c5275737400000000d41700000000000034dd718d5cc53262d401000000df6acb689907609b0400000037e397fc7c91f5e40100000040fe3ad401f8959a06000000d2bc9897eed08f1503000000f78b278be53f454c02000000ab3c0572291feb8b01000000bc9d89904f5b923f0100000037c8bb1350a9a2a803000000f3ff14d5ab52705903000000ea93e3f16f3d696202000000582211f65bb14b8904000000e65b00e46cedd0aa020000000000000000",
               "docs": [
                 " Get the chain's current version."
               ]
@@ -52617,11 +52617,11 @@
             {
               "name": "MaxDeposits",
               "type": 4,
-              "value": "0x10000000",
+              "value": "0x00020000",
               "docs": [
                 " Maximum deposit count.",
                 "",
-                " In currently design, this should not be greater than `u8::MAX`."
+                " In currently design, this should not be greater than `u16::MAX`."
               ]
             }
           ],
@@ -52976,7 +52976,7 @@
             {
               "name": "MaxDeposits",
               "type": 4,
-              "value": "0x10000000",
+              "value": "0x00020000",
               "docs": [
                 " Maximum deposit count."
               ]
