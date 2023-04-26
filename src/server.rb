@@ -146,7 +146,7 @@ end
 post "/pangolin/encode_transact_call" do
   ethereum_contract = params[:ethereum_contract][2..]
   ethereum_call = params[:ethereum_call][2..]
-  raise "pangolin_hub is null" params[:pangolin_hub].nil?
+  raise "pangolin_hub is null" if params[:pangolin_hub].nil?
   pangolin_hub =
     (
       params[:pangolin_hub]
