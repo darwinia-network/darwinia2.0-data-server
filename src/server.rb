@@ -144,8 +144,8 @@ post "/pangolin/versioned_xcm" do
 end
 
 post "/pangolin/encode_transact_call" do
-  ethereum_contract = params[:ethereum_contract][2..]
-  ethereum_call = params[:ethereum_call][2..]
+  ethereum_contract = params[:ethereum_contract]
+  message = params[:message]
   raise "pangolin_hub is null" if params[:pangolin_hub].nil?
   pangolin_hub =
     (
@@ -153,7 +153,7 @@ post "/pangolin/encode_transact_call" do
     ).strip
 
   puts "pangolin_hub: #{pangolin_hub}"
-  # get market fee from pangolin endpoint
+  # get market fee from pangolin hub
   fee =
     ScaleRb::HttpClient.json_rpc_call(
       config[:pangolin_rpc],
@@ -163,10 +163,19 @@ post "/pangolin/encode_transact_call" do
     )
   fee = PortableCodec.u256(fee.to_i(16))
 
-  # calculate the call data of `executeOnEthereum` function of pangolin endpoint
-  call_length_hex = (ethereum_call.length / 2).to_s(16)
-  data_of_execute_on_ethereum =
-    "0x6c069b1f000000000000000000000000#{ethereum_contract}0000000000000000000000000000000000000000000000000000000000000040#{call_length_hex.rjust(64, "0")}#{ethereum_call}00000000000000000000000000000000000000000000000000000000"
+  # calculate the call data of `send(address,bytes)` function of pangolin hub
+
+  data_of_send = "0xc89acc86#{
+    Util.bin_to_hex(
+      Abi.encode(
+        ["address", "bytes"], 
+        [
+          ethereum_contract,
+          Util.hex_to_bin(message)
+        ]
+      )
+    )
+  }"
 
   transact_call = {
     pallet_name: "EthereumXcm",
@@ -181,7 +190,7 @@ post "/pangolin/encode_transact_call" do
                 Call: pangolin_hub.to_bytes,
               },
               value: fee,
-              input: data_of_execute_on_ethereum.to_bytes,
+              input: data_of_send.to_bytes,
               access_list: "None",
             },
           },
