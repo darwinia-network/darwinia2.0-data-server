@@ -164,8 +164,7 @@ post "/pangolin/encode_transact_call" do
   fee = PortableCodec.u256(fee.to_i(16))
 
   # calculate the call data of `send(address,bytes)` function of pangolin hub
-
-  data_of_send = "0xc89acc86#{
+  data_of_send_hex = "0xc89acc86#{
     Util.bin_to_hex(
       Abi.encode(
         ["address", "bytes"], 
@@ -176,6 +175,7 @@ post "/pangolin/encode_transact_call" do
       )
     )
   }"
+  data_of_send = data_of_send_hex.to_bytes
 
   transact_call = {
     pallet_name: "EthereumXcm",
@@ -190,7 +190,7 @@ post "/pangolin/encode_transact_call" do
                 Call: pangolin_hub.to_bytes,
               },
               value: fee,
-              input: data_of_send.to_bytes,
+              input: data_of_send,
               access_list: "None",
             },
           },
@@ -202,7 +202,19 @@ post "/pangolin/encode_transact_call" do
 
   metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
   encoded_call = Metadata.encode_call(transact_call, metadata)
-  render_json encoded_call.to_hex
+  transact_call_hex = encoded_call.to_hex
+
+  # find the data_of_send begin and end index in encoded_call
+  data_of_send_begin_index = transact_call_hex.index(data_of_send_hex[2..])
+  data_of_send_end_index = data_of_send_begin_index + data_of_send.length * 2
+
+  
+  
+  render_json({
+    ethereum_xcm_transact_call: transact_call_hex,
+    hub_send: data_of_send_hex,
+    send_in_transact: [data_of_send_begin_index, data_of_send_end_index]
+  })
 end
 
 ##############################################################################
