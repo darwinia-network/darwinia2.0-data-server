@@ -13,26 +13,43 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   darwinia_client = Eth::Client::Http.new(darwinia_rpc)
   ethereum_client = Eth::Client::Http.new(ethereum_rpc)
   
-  # reserved1: Reserve on Darwinia Chain
-  reserved1 = get_account_info(darwinia_rpc, metadata, "0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284")[:ring].to_i
+  # Reserve on Darwinia Chain
+  reserve = get_account_info(darwinia_rpc, metadata, "0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284")[:ring].to_i
+  puts "reserve: #{reserve}"
 
-  # reserved2: Ecosystem Development Fund
+  # Ecosystem Development Fund
   token_contract = "0x9469D013805bFfB7D3DEBe5E7839237e535ec483"
-  fund_address = "0xfa4fe04f69f87859fcb31df3b9469f4e6447921c"
-  data = "0x70a08231000000000000000000000000#{fund_address[2..]}"
-  reserved2 =
+  #   Financing
+  financing_address = "0xfa4fe04f69f87859fcb31df3b9469f4e6447921c"
+  data = "0x70a08231000000000000000000000000#{financing_address[2..]}"
+  financing =
     ethereum_client.eth_call({ to: token_contract, data: data })["result"].to_i(
       16,
     ).to_f / 10**18
 
-  # reserved3: Treasury
+  #   BD & Marketing
+  bd_marketing_address = "0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47"
+  data = "0x70a08231000000000000000000000000#{bd_marketing_address[2..]}"
+  bd_marketing =
+    ethereum_client.eth_call({ to: token_contract, data: data })["result"].to_i(
+      16,
+      ).to_f / 10**18
+  puts "financing: #{financing}, bd_marketing: #{bd_marketing}"
+
+  ecosystem_development_fund = financing + bd_marketing
+
+  # Treasury
   treasury_address = "0x6d6f646c64612f74727372790000000000000000"
-  reserved3 =
+  treasury =
     darwinia_client.eth_get_balance(treasury_address)["result"].to_i(16).to_f / 10**18
+  puts "treasury: #{treasury}"
+
+  circulating_supply = total_issuance - (reserve + ecosystem_development_fund + treasury).to_i
+  puts "circulating_supply: #{circulating_supply}"
 
   {
     totalSupply: total_issuance,
-    circulatingSupply: total_issuance - (reserved1 + reserved2 + reserved3).to_i,
+    circulatingSupply: circulating_supply,
     maxSupply: 10_000_000_000,
   }
 end
