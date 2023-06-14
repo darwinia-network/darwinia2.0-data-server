@@ -9,11 +9,36 @@ require_relative "../config/config.rb"
 require_relative "./utils"
 require_relative "./storage"
 require_relative "./account"
+require_relative "./faucet"
 
 config = get_config
 
 get "/" do
   "Hello Darwinia!"
+end
+
+post "/faucet" do
+  network = params["network"] ||= "pangolin"
+  if not %w[pangolin pangoro].include?(network.downcase)
+    raise_with(
+      404,
+      "network #{network} not found, only `pangolin` and `pangoro` are supported",
+    )
+  end
+
+  # TODO: check the address is valid
+  address = params["address"]
+  unless address
+    raise_with(400, "address is required")
+  end
+  if address !~ /^0x[0-9a-fA-F]{40}$/
+    raise_with(400, "address is invalid")
+  end
+  
+  username = params["username"]
+
+  tx_hash = run_drop(address, network, username)
+  render_json tx_hash
 end
 
 ##############################################################################
