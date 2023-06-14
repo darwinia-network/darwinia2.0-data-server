@@ -86,7 +86,7 @@ def run_drop(address, network, username)
 
     drop(evm_client, mongo_client, address, network, username)
   else
-    raise "Already received it today, please come back tomorrow."
+    raise "already received it today, please come back tomorrow."
   end
 end
 
