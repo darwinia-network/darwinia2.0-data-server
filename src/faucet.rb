@@ -5,11 +5,11 @@ include Eth
 require "dotenv/load"
 
 def get_balance(eth_client, address)
-  eth_client.eth_balance(address)["result"].to_i(16)
+  eth_client.eth_get_balance(address)["result"].to_i(16)
 end
 
 def get_nonce(eth_client, address)
-  eth_client.eth_get_transaction_count(address)["result"].to_i(16)
+  eth_client.eth_get_transaction_count(address, "pending")["result"].to_i(16)
 end
 
 # address, network:index, dropped_at, username:index
@@ -90,7 +90,9 @@ def run_drop(address, network, username)
   end
 end
 
-# client = Eth::Client::Http.new("https://pangolin-rpc.darwinia.network")
+client = Eth::Client::Http.new("https://pangolin-rpc.darwinia.network")
+# puts get_nonce(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f")
+puts get_balance(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f")
 # tx = build_drop_tx(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f", "pangolin")
 # # puts tx.hash
 # # puts client.eth_send_raw_transaction(tx.hex)["result"]
