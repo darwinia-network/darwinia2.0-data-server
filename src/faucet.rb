@@ -4,14 +4,18 @@ require "json"
 include Eth
 require "dotenv/load"
 
+def get_balance(eth_client, address)
+  eth_client.eth_balance(address)["result"].to_i(16)
+end
+
 def get_nonce(eth_client, address)
   eth_client.eth_get_transaction_count(address)["result"].to_i(16)
 end
 
-# address:index, network:index, dropped_at, username
-def drop_allowed?(mongo_client, address, network)
+# address, network:index, dropped_at, username:index
+def drop_allowed?(mongo_client, username, network)
   db = mongo_client[:drops]
-  drop = db.find({ address: address.downcase, network: network }).first
+  drop = db.find({ username: username, network: network }).first
 
   !drop || drop[:dropped_at] + 24 * 60 * 60 < Time.now.to_i
 end
@@ -72,7 +76,7 @@ def run_drop(address, network, username)
     },
   )
 
-  if drop_allowed?(mongo_client, address, network)
+  if drop_allowed?(mongo_client, username, network)
     evm_client = 
       if network == "pangolin"
         Eth::Client::Http.new(ENV["PANGOLIN_ENDPOINT"])

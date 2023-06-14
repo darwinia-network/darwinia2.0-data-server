@@ -18,6 +18,9 @@ get "/" do
 end
 
 post "/faucet" do
+  verify = params["verify"]
+  raise_with(203, "verify failed") if !verify || !ENV["VERIFY_SEED"].split(",").include?(verify) 
+
   network = params["network"] ||= "pangolin"
   if not %w[pangolin pangoro].include?(network.downcase)
     raise_with(
