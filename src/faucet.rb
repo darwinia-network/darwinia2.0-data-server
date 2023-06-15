@@ -5,7 +5,7 @@ include Eth
 require "dotenv/load"
 
 def get_balance(eth_client, address)
-  eth_client.eth_get_balance(address)["result"].to_i(16)
+  eth_client.eth_get_balance(address)["result"].to_i(16) / 10**18
 end
 
 def get_nonce(eth_client, address)
@@ -84,15 +84,19 @@ def run_drop(address, network, username)
         Eth::Client::Http.new(ENV["PANGORO_ENDPOINT"])
       end
 
+    # check balance
+    raise "your address has enough test tokens." if get_balance(evm_client, address) > 200
+
     drop(evm_client, mongo_client, address, network, username)
   else
     raise "already received it today, please come back tomorrow."
   end
 end
 
-client = Eth::Client::Http.new("https://pangolin-rpc.darwinia.network")
+# client = Eth::Client::Http.new("https://pangolin-rpc.darwinia.network")
 # puts get_nonce(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f")
-puts get_balance(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f")
+# raise "your address has aleady own enough test tokens." if get_balance(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f") > 200
+# puts get_balance(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f")
 # tx = build_drop_tx(client, "0xDa97bC5EE02F33B92A0665620fFE956E21BAEf0f", "pangolin")
 # # puts tx.hash
 # # puts client.eth_send_raw_transaction(tx.hex)["result"]
