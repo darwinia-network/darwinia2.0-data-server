@@ -1,44 +1,42 @@
-require "sinatra"
-require "scale_rb"
-require "yaml"
-require "eth"
-require "json"
+require 'sinatra'
+require 'scale_rb'
+require 'yaml'
+require 'eth'
+require 'json'
 include Eth
 
-require_relative "../config/config.rb"
-require_relative "./utils"
-require_relative "./storage"
-require_relative "./account"
-require_relative "./faucet"
+require_relative '../config/config'
+require_relative './utils'
+require_relative './storage'
+require_relative './account'
+require_relative './faucet'
+
+require 'lightly'
 
 config = get_config
 
-get "/" do
-  "Hello Darwinia!"
+get '/' do
+  'Hello Darwinia!'
 end
 
-post "/faucet" do
-  verify = params["verify"]
-  raise_with(203, "verify failed") if !verify || !ENV["VERIFY_SEED"].split(",").include?(verify) 
+post '/faucet' do
+  verify = params['verify']
+  raise_with(203, 'verify failed') if !verify || !ENV['VERIFY_SEED'].split(',').include?(verify)
 
-  network = params["network"] ||= "pangolin"
-  if not %w[pangolin pangoro].include?(network.downcase)
+  network = params['network'] ||= 'pangolin'
+  unless %w[pangolin pangoro].include?(network.downcase)
     raise_with(
       404,
-      "network #{network} not found, only `pangolin` and `pangoro` are supported",
+      "network #{network} not found, only `pangolin` and `pangoro` are supported"
     )
   end
 
   # TODO: check the address is valid
-  address = params["address"]
-  unless address
-    raise_with(400, "address is required")
-  end
-  if address !~ /^0x[0-9a-fA-F]{40}$/
-    raise_with(400, "address is invalid")
-  end
-  
-  username = params["username"]
+  address = params['address']
+  raise_with(400, 'address is required') unless address
+  raise_with(400, 'address is invalid') if address !~ /^0x[0-9a-fA-F]{40}$/
+
+  username = params['username']
 
   tx_hash = run_drop(address, network, username)
   render_json tx_hash
@@ -47,60 +45,56 @@ end
 ##############################################################################
 # Darwinia & Crab's supplies
 ##############################################################################
-get "/supply/ring" do
-  network = (params["network"] ||= "darwinia").downcase
-  if not %w[darwinia crab].include?(network)
+get '/supply/ring' do
+  network = (params['network'] ||= 'darwinia').downcase
+  unless %w[darwinia crab].include?(network)
     raise_with(
       404,
-      "network #{network} not found, only `darwinia` and `crab` are supported",
+      "network #{network} not found, only `darwinia` and `crab` are supported"
     )
   end
 
   result = File.read("./data/#{network}-supplies.json")
   result = JSON.parse(result)
 
-  if params["t"]
+  if params['t']
     content_type :text
-    t = to_camel(params["t"])
-    if %w[totalSupply circulatingSupply maxSupply].include?(t)
-      return result["ringSupplies"][t].to_s
-    end
+    t = to_camel(params['t'])
+    return result['ringSupplies'][t].to_s if %w[totalSupply circulatingSupply maxSupply].include?(t)
   end
 
   content_type :json
-  { code: 0, data: result["ringSupplies"] }.to_json
+  { code: 0, data: result['ringSupplies'] }.to_json
 end
 
-get "/supply/kton" do
-  network = (params["network"] ||= "darwinia").downcase
-  if not %w[darwinia crab].include?(network)
+get '/supply/kton' do
+  network = (params['network'] ||= 'darwinia').downcase
+  unless %w[darwinia crab].include?(network)
     raise_with(
       404,
-      "network #{network} not found, only `darwinia` and `crab` are supported",
+      "network #{network} not found, only `darwinia` and `crab` are supported"
     )
   end
 
   result = File.read("./data/#{network}-supplies.json")
   result = JSON.parse(result)
 
-  if params["t"]
+  if params['t']
     content_type :text
-    t = to_camel(params["t"])
-    if %w[totalSupply circulatingSupply maxSupply].include?(t)
-      return result["ktonSupplies"][t].to_s
-    end
+    t = to_camel(params['t'])
+    return result['ktonSupplies'][t].to_s if %w[totalSupply circulatingSupply maxSupply].include?(t)
   end
 
   content_type :json
-  { code: 0, data: result["ktonSupplies"] }.to_json
+  { code: 0, data: result['ktonSupplies'] }.to_json
 end
 
-get "/seilppuswithbalances" do
-  network = (params["network"] ||= "darwinia").downcase
-  if not %w[darwinia crab].include?(network)
+get '/seilppuswithbalances' do
+  network = (params['network'] ||= 'darwinia').downcase
+  unless %w[darwinia crab].include?(network)
     raise_with(
       404,
-      "network #{network} not found, only `darwinia` and `crab` are supported",
+      "network #{network} not found, only `darwinia` and `crab` are supported"
     )
   end
 
@@ -111,12 +105,10 @@ end
 ##############################################################################
 # Crab
 ##############################################################################
-get "/crab/address/:address" do
+get '/crab/address/:address' do
   content_type :json
   # address must presented
-  unless params[:address]
-    return { code: 1, message: "address is required" }.to_json
-  end
+  return { code: 1, message: 'address is required' }.to_json unless params[:address]
 
   if params[:address].length == 48
     return(
@@ -124,43 +116,44 @@ get "/crab/address/:address" do
         code: 0,
         data: {
           pubkey: "0x#{Address.decode(params[:address], 42, true)}",
-          ss58: params[:address],
-        },
+          ss58: params[:address]
+        }
       }.to_json
     )
   elsif params[:address].length == 66
-    raise "Not implemented yet"
+    raise 'Not implemented yet'
   else
-    return { code: 1, message: "address is invalid" }.to_json
+    return { code: 1, message: 'address is invalid' }.to_json
   end
 end
 
 ##############################################################################
 # Pangolin
 ##############################################################################
-get "/pangolin/templates/:filename" do
+get '/pangolin/templates/:filename' do
   content_type :yaml
 
   # check the file exists, and then render with 404
-  file = File.join("./templates", "#{params[:filename]}")
+  file = File.join('./templates', "#{params[:filename]}")
   return 404 unless File.exist? file
+
   File.read(file)
 end
 
-get "/pangolin/templates" do
+get '/pangolin/templates' do
   # get file list in templates folder
-  files = Dir.entries("./templates").select { |f| f.end_with?(".yml") }
+  files = Dir.entries('./templates').select { |f| f.end_with?('.yml') }
   content_type :json
   { code: 0, data: files }.to_json
 end
 
-post "/pangolin/versioned_xcm" do
+post '/pangolin/versioned_xcm' do
   metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
   registry = Metadata.build_registry(metadata)
 
   # Find portable type id of VersionedXcm.
   # We just need to find type id of `PolkadotXcm.Execute`'s first param.
-  call_type = Metadata.get_call_type("PolkadotXcm", "Execute", metadata)
+  call_type = Metadata.get_call_type('PolkadotXcm', 'Execute', metadata)
   versioned_xcm_type_id = call_type._get(:fields).first._get(:type)
 
   # encode the value from request body
@@ -171,23 +164,24 @@ post "/pangolin/versioned_xcm" do
   { code: 0, data: bytes.to_hex }.to_json
 end
 
-post "/pangolin/encode_transact_call" do
+post '/pangolin/encode_transact_call' do
   ethereum_contract = params[:ethereum_contract]
   message = params[:message]
-  raise "pangolin_hub is null" if params[:pangolin_hub].nil?
+  raise 'pangolin_hub is null' if params[:pangolin_hub].nil?
+
   pangolin_hub =
-    (
-      params[:pangolin_hub]
-    ).strip
+
+    params[:pangolin_hub]
+    .strip
 
   puts "pangolin_hub: #{pangolin_hub}"
   # get market fee from pangolin hub
   fee =
     ScaleRb::HttpClient.json_rpc_call(
       config[:pangolin_rpc],
-      "eth_call",
-      { data: "0xddca3f43", gas: "0x5b8d80", to: pangolin_hub },
-      "latest",
+      'eth_call',
+      { data: '0xddca3f43', gas: '0x5b8d80', to: pangolin_hub },
+      'latest'
     )
   fee = PortableCodec.u256(fee.to_i(16))
 
@@ -195,7 +189,7 @@ post "/pangolin/encode_transact_call" do
   data_of_send_hex = "0xc89acc86#{
     Util.bin_to_hex(
       Abi.encode(
-        ["address", "bytes"], 
+        %w[address bytes],
         [
           ethereum_contract,
           Util.hex_to_bin(message)
@@ -206,8 +200,8 @@ post "/pangolin/encode_transact_call" do
   data_of_send = data_of_send_hex.to_bytes
 
   transact_call = {
-    pallet_name: "EthereumXcm",
-    call_name: "Transact",
+    pallet_name: 'EthereumXcm',
+    call_name: 'Transact',
     call: [
       {
         transact: {
@@ -215,17 +209,17 @@ post "/pangolin/encode_transact_call" do
             V2: {
               gas_limit: PortableCodec.u256(600_000),
               action: {
-                Call: pangolin_hub.to_bytes,
+                Call: pangolin_hub.to_bytes
               },
               value: fee,
               input: data_of_send,
-              access_list: "None",
-            },
-          },
-        },
+              access_list: 'None'
+            }
+          }
+        }
       },
-      [],
-    ],
+      []
+    ]
   }
 
   metadata = JSON.parse(File.read(config[:metadata][:pangolin]))
@@ -236,21 +230,19 @@ post "/pangolin/encode_transact_call" do
   data_of_send_begin_index = transact_call_hex.index(data_of_send_hex[2..])
   data_of_send_end_index = data_of_send_begin_index + data_of_send.length * 2
 
-  
-  
   render_json({
-    ethereum_xcm_transact_call: transact_call_hex,
-    hub_send: data_of_send_hex,
-    send_in_transact: [data_of_send_begin_index, data_of_send_end_index]
-  })
+                ethereum_xcm_transact_call: transact_call_hex,
+                hub_send: data_of_send_hex,
+                send_in_transact: [data_of_send_begin_index, data_of_send_end_index]
+              })
 end
 
 ##############################################################################
 # General
 ##############################################################################
-get "/:network/metadata" do
+get '/:network/metadata' do
   network = params[:network].downcase
-  if not %w[darwinia crab pangolin].include?(network)
+  unless %w[darwinia crab pangolin].include?(network)
     raise_with 404,
                "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
   end
@@ -260,9 +252,9 @@ get "/:network/metadata" do
   metadata.to_json
 end
 
-get "/:network/accounts/:address" do
+get '/:network/accounts/:address' do
   network = network = params[:network].downcase
-  if not %w[darwinia crab pangolin].include?(network)
+  unless %w[darwinia crab pangolin].include?(network)
     raise_with 404,
                "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
   end
@@ -291,9 +283,9 @@ end
 # key has two parts: key1 & key2
 # /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
 # /crab/assets/account/0x1234 -> error
-get "/:network/:pallet_name/:storage_name/?:key1?/?:key2?" do
-  network = network = params[:network].downcase
-  if not %w[darwinia crab pangolin].include?(network)
+get '/:network/:pallet_name/:storage_name/?:key1?/?:key2?' do
+  network = params[:network].downcase
+  unless %w[darwinia crab pangolin].include?(network)
     raise_with 404,
                "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
   end
@@ -301,17 +293,32 @@ get "/:network/:pallet_name/:storage_name/?:key1?/?:key2?" do
   metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
   rpc = config["#{network}_rpc".to_sym]
 
-  storage =
-    get_storage(
-      rpc,
-      metadata,
-      params[:pallet_name],
-      params[:storage_name],
-      params[:key1],
-      params[:key2],
-    )
+  lightly = Lightly.new
+  lightly.life =
+    if params['cache']
+      unless matches_time_span_pattern?(params['cache'])
+        raise 'cache must be a valid time span like: 20s, 2m, 12h, and 1d'
+      end
 
-  render_json storage
+      params['cache']
+    else
+      '2m'
+    end
+  storage_json = lightly.get request.path_info do
+    storage =
+      get_storage(
+        rpc,
+        metadata,
+        params[:pallet_name],
+        params[:storage_name],
+        params[:key1],
+        params[:key2]
+      )
+
+    storage.to_json
+  end
+
+  render_json JSON.parse(storage_json)
 end
 
 ##############################################################################
@@ -325,7 +332,7 @@ end
 
 error do |e|
   content_type :json
-  if e.class == RuntimeError
+  if e.instance_of?(RuntimeError)
     { code: 1, message: "#{e.message}" }.to_json
   else
     { code: 1, message: "#{e.class} => #{e.message}" }.to_json

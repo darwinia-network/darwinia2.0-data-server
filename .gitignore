@@ -7,3 +7,4 @@ package-lock.json
 .idea
 .devcontainer/docker-compose.yml
 .devcontainer/devcontainer.json
+/cache
