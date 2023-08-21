@@ -55,7 +55,24 @@ def matches_time_span_pattern?(input_string)
   !!(input_string =~ regex)
 end
 
-puts matches_time_span_pattern?('12')
+# https://github.com/darwinia-network/darwinia2.0-staking-ui/blob/8f9d88b4c874c36cedf140f0a288250507d3b293/src/utils/misc.ts#L5
+def calc_power(staked_ring, staked_kton, ring_pool, kton_pool)
+  raise 'ring_pool is zero' if ring_pool.zero?
+
+  d = kton_pool.zero? ? 0 : ring_pool.to_f / kton_pool
+  1_000_000_000 * (staked_ring + staked_kton * d) / (ring_pool * 2)
+end
+
+def write_data_to_file(data, filename)
+  data_dir = './data'
+  FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
+  File.write(
+    File.join(data_dir, filename),
+    data.to_json
+  )
+end
+
+# puts matches_time_span_pattern?('12')
 
 # require "scale_rb"
 # require "eth"
@@ -71,4 +88,3 @@ puts matches_time_span_pattern?('12')
 #       ]
 #     )
 #   )
-

@@ -240,6 +240,20 @@ end
 ##############################################################################
 # General
 ##############################################################################
+get '/:network/nominees' do
+  network = params[:network].downcase
+  unless %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+
+  result = File.read("./data/#{network}-nominees.json")
+  result = JSON.parse(result)
+
+  content_type :json
+  { code: 0, data: result }.to_json
+end
+
 get '/:network/metadata' do
   network = params[:network].downcase
   unless %w[darwinia crab pangolin].include?(network)
@@ -253,7 +267,7 @@ get '/:network/metadata' do
 end
 
 get '/:network/accounts/:address' do
-  network = network = params[:network].downcase
+  network = params[:network].downcase
   unless %w[darwinia crab pangolin].include?(network)
     raise_with 404,
                "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"

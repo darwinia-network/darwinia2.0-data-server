@@ -12,16 +12,13 @@ services:
     command: rake gen_supplies_data_loop
     volumes:
       - ./data:/usr/src/app/data
-  update_goerli_pangolin_messages:
+  update_nominees:
     build: .
     env_file:
       - .env
-    command: rake update_goerli_pangolin_messages
-  update_pangolin_goerli_messages:
-    build: .
-    env_file:
-      - .env
-    command: rake update_pangolin_goerli_messages
+    command: rake update_nominees_loop
+    volumes:
+      - ./data:/usr/src/app/data
   server:
     build: .
     env_file:
