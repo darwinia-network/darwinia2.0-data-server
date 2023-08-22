@@ -240,6 +240,20 @@ end
 ##############################################################################
 # General
 ##############################################################################
+get '/:network/staking' do
+  network = params[:network].downcase
+  unless %w[darwinia crab pangolin].include?(network)
+    raise_with 404,
+               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
+  end
+
+  result = File.read("./data/#{network}-staking.json")
+  result = JSON.parse(result)
+
+  content_type :json
+  { code: 0, data: result }.to_json
+end
+
 get '/:network/nominees' do
   network = params[:network].downcase
   unless %w[darwinia crab pangolin].include?(network)
