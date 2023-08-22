@@ -100,7 +100,10 @@ def staked_ring_in_deposits(ledger, deposits)
     0
   else
     # id => deposit
-    all_deposits = deposits.select { |deposit| deposit[:in_use] == true }.map { |deposit| [deposit[:id], deposit] }.to_h
+    all_deposits = deposits.select do |deposit|
+                     deposit[:in_use] == true
+                   end.map { |deposit| [deposit[:id], deposit] }.to_h
+    # all_deposits = deposits.map { |deposit| [deposit[:id], deposit] }.to_h
 
     deposit_ids_in_ledger = ledger[:staked_deposits] # + ledger[:unstaking_deposits]
     deposit_ids_in_ledger.reduce(0) do |sum, deposit_id|
@@ -180,10 +183,28 @@ def get_nominee_power(rpc, metadata, address)
   calc_power(total[:staked_ring], total[:staked_kton], ring_pool, kton_pool)
 end
 
+def get_nominee_commissions(rpc, metadata)
+  storages = get_storage(rpc, metadata, 'darwinia_staking', 'collators', nil, nil)
+  storages.map do |storage|
+    address = "0x#{storage[:storage_key][-40..]}"
+    [address, storage[:storage] / 10_000_000]
+  end.to_h
+end
+
+def get_collators(rpc, metadata)
+  storages = get_storage(rpc, metadata, 'darwinia_staking', 'exposures', nil, nil)
+  storages.map do |storage|
+    "0x#{storage[:storage_key][-40..]}"
+  end
+end
+
 # require_relative '../config/config'
 # config = get_config
 # crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
 # crab_rpc = config[:crab_rpc]
+
+# # collators
+# puts collators(crab_rpc, crab_metadata)
 
 # result = get_account_staking_info(
 #   crab_rpc,

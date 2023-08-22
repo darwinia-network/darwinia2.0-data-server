@@ -96,6 +96,8 @@ task :update_nominees, [:network_name] do |_t, args|
 
   ring_pool = get_storage(rpc, metadata, 'darwinia_staking', 'ring_pool', nil, nil)
   kton_pool = get_storage(rpc, metadata, 'darwinia_staking', 'kton_pool', nil, nil)
+  nominee_commissions = get_nominee_commissions(rpc, metadata)
+  collators = get_collators(rpc, metadata)
 
   # 1. Get all nominators with their nominees
   # ---------------------------------------
@@ -147,10 +149,16 @@ task :update_nominees, [:network_name] do |_t, args|
     power = calc_power(staking_info[:staked_ring], staking_info[:staked_kton], ring_pool, kton_pool)
     [nominee_address, power]
   end.to_h
-  logger.debug JSON.pretty_generate(nominee_powers)
 
-  # 5. write to file
+  # 5. Set the collators committee
+  # ---------------------------------------
+  result = nominee_powers.keys.map do |key|
+    [key, { power: nominee_powers[key], commission: nominee_commissions[key], is_collator: collators.include?(key) }]
+  end.to_h
+  logger.debug JSON.pretty_generate(result)
+
+  # 6. write to file
   # ---------------------------------------
   logger.debug "writing #{network_name} nominees to file..."
-  write_data_to_file(nominee_powers, "#{network_name}-nominees.json")
+  write_data_to_file(result, "#{network_name}-nominees.json")
 end
