@@ -87,6 +87,7 @@ end
 # Multi networks
 ##########################################
 require 'logger'
+# nominee = active collators + waiting collators + other nominees who have nominations backing
 task :update_nominees, [:network_name] do |_t, args|
   logger = Logger.new($stdout)
   logger.level = Logger::DEBUG
@@ -100,8 +101,8 @@ task :update_nominees, [:network_name] do |_t, args|
 
     ring_pool = get_storage(rpc, metadata, 'darwinia_staking', 'ring_pool', nil, nil)
     kton_pool = get_storage(rpc, metadata, 'darwinia_staking', 'kton_pool', nil, nil)
-    nominee_commissions = get_nominee_commissions(rpc, metadata)
-    collators = get_collators(rpc, metadata)
+    collator_commissions = get_collator_commissions(rpc, metadata) # includes active and waiting collators
+    active_collator_addresses = get_active_collators(rpc, metadata)
 
     # 1. Get all nominators with their nominees
     # ---------------------------------------
@@ -156,8 +157,17 @@ task :update_nominees, [:network_name] do |_t, args|
 
     # 5. Set the collators committee
     # ---------------------------------------
-    result = nominee_powers.keys.map do |key|
-      [key, { power: nominee_powers[key], commission: nominee_commissions[key], is_collator: collators.include?(key) }]
+    all_nominee_addresses = (nominee_powers.keys + collator_commissions.keys).uniq
+    waiting_collator_addresses = collator_commissions.keys - active_collator_addresses
+    result = all_nominee_addresses.map do |nominee_address|
+      [
+        nominee_address,
+        {
+          power: nominee_powers[nominee_address],
+          commission: collator_commissions[nominee_address],
+          status: get_nominee_status(active_collator_addresses, waiting_collator_addresses, nominee_address)
+        }
+      ]
     end.to_h
     # logger.debug JSON.pretty_generate(result)
 

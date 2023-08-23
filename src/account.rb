@@ -183,7 +183,7 @@ def get_nominee_power(rpc, metadata, address)
   calc_power(total[:staked_ring], total[:staked_kton], ring_pool, kton_pool)
 end
 
-def get_nominee_commissions(rpc, metadata)
+def get_collator_commissions(rpc, metadata)
   storages = get_storage(rpc, metadata, 'darwinia_staking', 'collators', nil, nil)
   storages.map do |storage|
     address = "0x#{storage[:storage_key][-40..]}"
@@ -191,10 +191,18 @@ def get_nominee_commissions(rpc, metadata)
   end.to_h
 end
 
-def get_collators(rpc, metadata)
+def get_active_collators(rpc, metadata)
   storages = get_storage(rpc, metadata, 'darwinia_staking', 'exposures', nil, nil)
   storages.map do |storage|
     "0x#{storage[:storage_key][-40..]}"
+  end
+end
+
+def get_nominee_status(active_collator_addresses, waiting_collator_addresses, nominee_address)
+  if active_collator_addresses.include?(nominee_address)
+    'working'
+  else
+    waiting_collator_addresses.include?(nominee_address) ? 'waiting' : 'quit'
   end
 end
 
