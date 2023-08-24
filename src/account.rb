@@ -206,10 +206,24 @@ def get_nominee_status(active_collator_addresses, waiting_collator_addresses, no
   end
 end
 
+def get_identities(rpc, metadata)
+  storages = get_storage(rpc, metadata, 'identity', 'identity_of', nil, nil)
+  storages.map do |storage|
+    address = "0x#{storage[:storage_key][-40..]}"
+    name = if storage[:storage][:info][:display].instance_of?(Hash)
+             storage[:storage][:info][:display].values.first.to_utf8
+           end
+    [address, name]
+  end.to_h
+end
+
 # require_relative '../config/config'
 # config = get_config
 # crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
 # crab_rpc = config[:crab_rpc]
+
+# # get_identities
+# puts get_identities(crab_rpc, crab_metadata)
 
 # # collators
 # puts collators(crab_rpc, crab_metadata)

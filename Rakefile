@@ -103,6 +103,7 @@ task :update_nominees, [:network_name] do |_t, args|
     kton_pool = get_storage(rpc, metadata, 'darwinia_staking', 'kton_pool', nil, nil)
     collator_commissions = get_collator_commissions(rpc, metadata) # includes active and waiting collators
     active_collator_addresses = get_active_collators(rpc, metadata)
+    identities = get_identities(rpc, metadata) # address => name
 
     # 1. Get all nominators with their nominees
     # ---------------------------------------
@@ -163,6 +164,7 @@ task :update_nominees, [:network_name] do |_t, args|
       [
         nominee_address,
         {
+          name: identities[nominee_address],
           power: nominee_powers[nominee_address],
           commission: collator_commissions[nominee_address],
           status: get_nominee_status(active_collator_addresses, waiting_collator_addresses, nominee_address)
