@@ -39,16 +39,16 @@ def get_storage2(rpc, metadata, pallet_name, storage_name, key_part1: nil, key_p
   )
 end
 
-require_relative '../config/config'
-config = get_config
-crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
-crab_rpc = config[:crab_rpc]
-
-p get_storage2(
-  crab_rpc,
-  crab_metadata,
-  'deposit',
-  'deposits',
-  key_part1: '0x0a1287977578F888bdc1c7627781AF1cc000e6ab',
-  at: '0xfdd0465158c85d8fc8b77d866a2fc7e542b78d48f1b37a0d7bb7ec4378d43b08'
-)
+# require_relative '../config/config'
+# config = get_config
+# crab_metadata = JSON.parse(File.read(config[:metadata][:crab]))
+# crab_rpc = config[:crab_rpc]
+#
+# p get_storage2(
+#   crab_rpc,
+#   crab_metadata,
+#   'deposit',
+#   'deposits',
+#   key_part1: '0x0a1287977578F888bdc1c7627781AF1cc000e6ab',
+#   at: '0xfdd0465158c85d8fc8b77d866a2fc7e542b78d48f1b37a0d7bb7ec4378d43b08'
+# )
