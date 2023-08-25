@@ -13,6 +13,8 @@ require_relative './faucet'
 
 require 'lightly'
 
+ScaleRb.logger.level = Logger::DEBUG
+
 config = get_config
 
 get '/' do
@@ -311,6 +313,9 @@ end
 # key has two parts: key1 & key2
 # /crab/assets/account/0/0x0a1287977578F888bdc1c7627781AF1cc000e6ab
 # /crab/assets/account/0x1234 -> error
+#
+# if you want to query the history, add a block param, like:
+# /crab/deposit/deposits/0x0a1287977578F888bdc1c7627781AF1cc000e6ab?block=0x1234...
 get '/:network/:pallet_name/:storage_name/?:key1?/?:key2?' do
   network = params[:network].downcase
   unless %w[darwinia crab pangolin].include?(network)
@@ -322,25 +327,17 @@ get '/:network/:pallet_name/:storage_name/?:key1?/?:key2?' do
   rpc = config["#{network}_rpc".to_sym]
 
   lightly = Lightly.new
-  lightly.life =
-    if params['cache']
-      unless matches_time_span_pattern?(params['cache'])
-        raise 'cache must be a valid time span like: 20s, 2m, 12h, and 1d'
-      end
-
-      params['cache']
-    else
-      '2m'
-    end
-  storage_json = lightly.get request.path_info do
+  lightly.life = params['block'] ? '730d' : '5m'
+  storage_json = lightly.get request.fullpath do
     storage =
-      get_storage(
+      get_storage2(
         rpc,
         metadata,
         params[:pallet_name],
         params[:storage_name],
-        params[:key1],
-        params[:key2]
+        key_part1: params[:key1],
+        key_part2: params[:key2],
+        at: params[:block]
       )
 
     storage.to_json
@@ -354,14 +351,14 @@ end
 ##############################################################################
 def raise_with(status, message)
   content_type :json
-  ret = { code: 1, message: "#{message}" }.to_json
+  ret = { code: 1, message: }.to_json
   halt status, ret
 end
 
 error do |e|
   content_type :json
   if e.instance_of?(RuntimeError)
-    { code: 1, message: "#{e.message}" }.to_json
+    { code: 1, message: e.message }.to_json
   else
     { code: 1, message: "#{e.class} => #{e.message}" }.to_json
   end

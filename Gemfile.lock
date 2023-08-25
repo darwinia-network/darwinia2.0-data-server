@@ -1,3 +1,11 @@
+PATH
+  remote: /workspaces/scale_rb
+  specs:
+    scale_rb (0.1.13)
+      base58
+      blake2b_rs (~> 0.1.4)
+      xxhash
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -86,10 +94,6 @@ GEM
       rubyzip (~> 2.3)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
-    scale_rb (0.1.10)
-      base58
-      blake2b_rs (~> 0.1.4)
-      xxhash
     scrypt (3.0.7)
       ffi-compiler (>= 1.0, < 2.0)
     sinatra (3.0.5)
@@ -119,7 +123,7 @@ DEPENDENCIES
   lightly
   mongo (~> 2)
   puma
-  scale_rb (= 0.1.10)
+  scale_rb!
   sinatra
 
 BUNDLED WITH
