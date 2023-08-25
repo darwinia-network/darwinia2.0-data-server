@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-# gem 'scale_rb', '0.1.12'
-gem 'scale_rb', path: '/workspaces/scale_rb'
+gem 'scale_rb', '0.1.13'
+# gem 'scale_rb', path: '/workspaces/scale_rb'
 gem 'sinatra'
 
 gem 'async', '~> 2.5'
