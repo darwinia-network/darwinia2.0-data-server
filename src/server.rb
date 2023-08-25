@@ -242,51 +242,14 @@ end
 ##############################################################################
 # General
 ##############################################################################
-get '/:network/staking' do
-  network = params[:network].downcase
-  unless %w[darwinia crab pangolin].include?(network)
-    raise_with 404,
-               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
-  end
-
-  result = File.read("./data/#{network}-staking.json")
-  result = JSON.parse(result)
-
-  content_type :json
-  { code: 0, data: result }.to_json
-end
-
-get '/:network/nominees' do
-  network = params[:network].downcase
-  unless %w[darwinia crab pangolin].include?(network)
-    raise_with 404,
-               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
-  end
-
-  result = File.read("./data/#{network}-nominees.json")
-  result = JSON.parse(result)
-
-  content_type :json
-  { code: 0, data: result }.to_json
-end
-
-get '/:network/metadata' do
-  network = params[:network].downcase
-  unless %w[darwinia crab pangolin].include?(network)
-    raise_with 404,
-               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
-  end
-  metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
-
-  content_type :json
-  metadata.to_json
-end
-
 get '/:network/accounts/:address' do
   network = params[:network].downcase
+  address = params[:address].downcase
   unless %w[darwinia crab pangolin].include?(network)
-    raise_with 404,
-               "network #{network} not found, only `darwinia`, `crab` and `pangolin` are supported"
+    raise_with(
+      404,
+      "'#{network}/accounts/#{address}' not found"
+    )
   end
 
   metadata = JSON.parse(File.read(config[:metadata][network.to_sym]))
@@ -295,6 +258,21 @@ get '/:network/accounts/:address' do
   info = get_account_info(rpc, metadata, params[:address])
 
   render_json info
+end
+
+get '/:network/metadata' do
+  network = params[:network].downcase
+  render_file(network, 'metadata', config)
+end
+
+get '/:network/staking' do
+  network = params[:network].downcase
+  render_file(network, 'staking')
+end
+
+get '/:network/nominees' do
+  network = params[:network].downcase
+  render_file(network, 'nominees')
 end
 
 # Example:
@@ -361,5 +339,35 @@ error do |e|
     { code: 1, message: e.message }.to_json
   else
     { code: 1, message: "#{e.class} => #{e.message}" }.to_json
+  end
+end
+
+##############################################################################
+# render helpers
+##############################################################################
+def render_json(data)
+  content_type :json
+  if data
+    { code: 0, data: }.to_json
+  else
+    { code: 1, message: 'not found' }.to_json
+  end
+end
+
+def render_file(network, target, config = nil)
+  if %w[darwinia crab pangolin].include?(network) && %w[metadata staking nominees].include?(target)
+    file =
+      if target == 'metadata'
+        config[:metadata][network.to_sym]
+      else
+        "./data/#{network}-#{target}.json"
+      end
+
+    render_json JSON.parse(File.read(file))
+  else
+    raise_with(
+      404,
+      "'#{network}/#{target}' not found"
+    )
   end
 end

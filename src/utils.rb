@@ -22,15 +22,6 @@ def c(key)
   end
 end
 
-def render_json(data)
-  content_type :json
-  if data
-    { code: 0, data: }.to_json
-  else
-    { code: 1, message: 'not found' }.to_json
-  end
-end
-
 def timed
   b = Time.now
   yield
