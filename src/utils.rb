@@ -59,7 +59,7 @@ def write_data_to_file(data, filename)
   FileUtils.mkdir_p(data_dir) unless File.directory?(data_dir)
   File.write(
     File.join(data_dir, filename),
-    data.to_json
+    { generated_at: Time.now, data: }.to_json
   )
 end
 

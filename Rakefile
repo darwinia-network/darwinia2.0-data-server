@@ -121,7 +121,8 @@ task :update_nominees, [:network_name] do |_t, args|
     nominator_nominee_mapping =
       nominators.map do |item|
         nominator_address = "0x#{item[:storage_key][-40..]}"
-        nominee_address = item[:storage].to_hex
+
+        nominee_address = item[:storage]
         [nominator_address, nominee_address]
       end.to_h
 

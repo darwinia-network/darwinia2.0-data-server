@@ -41,7 +41,7 @@ post '/faucet' do
   username = params['username']
 
   tx_hash = run_drop(address, network, username)
-  render_json tx_hash
+  { code: 0, data: tx_hash }.to_json
 end
 
 ##############################################################################
@@ -336,22 +336,20 @@ end
 error do |e|
   content_type :json
   if e.instance_of?(RuntimeError)
-    { code: 1, message: e.message }.to_json
+    { code: 1, error: e.message }.to_json
   else
-    { code: 1, message: "#{e.class} => #{e.message}" }.to_json
+    { code: 1, error: "#{e.class} => #{e.message}" }.to_json
   end
 end
 
 ##############################################################################
 # render helpers
 ##############################################################################
-def render_json(data)
+def render_json(result)
   content_type :json
-  if data
-    { code: 0, data: }.to_json
-  else
-    { code: 1, message: 'not found' }.to_json
-  end
+  raise 'result is null' unless result
+
+  { code: 0, result: }.to_json
 end
 
 def render_file(network, target, config = nil)

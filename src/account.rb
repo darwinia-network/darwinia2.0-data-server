@@ -211,7 +211,7 @@ def get_identities(rpc, metadata)
   storages.map do |storage|
     address = "0x#{storage[:storage_key][-40..]}"
     name = if storage[:storage][:info][:display].instance_of?(Hash)
-             storage[:storage][:info][:display].values.first.to_utf8
+             storage[:storage][:info][:display].values.first.to_bytes.to_utf8
            end
     [address, name]
   end.to_h
