@@ -49,8 +49,8 @@ end
 def calc_power(staked_ring, staked_kton, ring_pool, kton_pool)
   raise 'require ring_pool > 0' if ring_pool <= 0
 
-  power_of_ring = 500_000_000 * (staked_ring / ring_pool)
-  power_of_kton = kton_pool.positive? ? 500_000_000 * (staked_kton / kton_pool) : 0
+  power_of_ring = 500_000_000 * (staked_ring.to_f / ring_pool)
+  power_of_kton = kton_pool.positive? ? 500_000_000 * (staked_kton.to_f / kton_pool) : 0
 
   power_of_ring + power_of_kton
 end

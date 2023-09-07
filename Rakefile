@@ -2,12 +2,10 @@ require 'scale_rb'
 require './src/utils'
 require './src/supplies'
 require './src/metadata'
-require './src/track-goerli'
-require './src/track-pangolin'
 require './src/storage'
 require './src/account'
-require './src/supply/ring'
-require './src/supply/kton'
+require './src/staking/ring'
+require './src/staking/kton'
 require './config/config'
 config = get_config
 
@@ -189,14 +187,25 @@ task :gen_staking_data, [:network_name] do |_t, args|
     rpc = config["#{network_name}_rpc".to_sym]
     metadata = JSON.parse(File.read(config[:metadata][network_name.to_sym]))
 
+    staking_ring = Staking::Ring.get_all_staking_ring(rpc, metadata)
+    staking_ring_unmigrated = Staking::Ring.get_all_staking_ring_unmigrated(rpc, metadata)
     result = {
       ring: {
-        staking: get_all_staking_ring(rpc, metadata),
-        unmigrated: get_all_staking_ring_unmigrated(rpc, metadata)
+        migrated: {
+          staking: staking_ring[:staking_ring],
+          staking_in_deposits: staking_ring[:staking_ring_in_deposits],
+          total: staking_ring[:total]
+        },
+        unmigrated: {
+          staking: staking_ring_unmigrated[:staking_ring],
+          staking_in_deposits: staking_ring_unmigrated[:staking_ring_in_deposits],
+          total: staking_ring_unmigrated[:total]
+        },
+        total: staking_ring[:total] + staking_ring_unmigrated[:total]
       },
       kton: {
-        staking: get_staking_kton(rpc, metadata),
-        unmigrated: get_staking_kton_unmigrated(rpc, metadata)
+        staking: Staking::Kton.get_staking_kton(rpc, metadata),
+        unmigrated: Staking::Kton.get_staking_kton_unmigrated(rpc, metadata)
       }
     }
 

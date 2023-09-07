@@ -8,18 +8,24 @@ require_relative './utils'
 require_relative 'account'
 
 def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
-  total_issuance = get_total_insurance(darwinia_rpc, metadata)
-
   darwinia_client = Eth::Client::Http.new(darwinia_rpc)
   ethereum_client = Eth::Client::Http.new(ethereum_rpc)
 
-  # Reserve on Darwinia Chain
+  ##########################
+  # Calc total issuance
+  ##########################
+  total_issuance = Supply::Ring.get_total_insurance(darwinia_rpc, metadata)
+
+  ##########################
+  # Calc reserves
+  ##########################
+  # 1. Reserve on Darwinia Chain
   reserve = get_account_info(darwinia_rpc, metadata, '0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284')[:ring].to_i
   puts "reserve: #{reserve}"
 
-  # Ecosystem Development Fund
+  # 2. Ecosystem Development Fund
   token_contract = '0x9469D013805bFfB7D3DEBe5E7839237e535ec483'
-  #   Financing
+  # Financing
   financing_address = '0xfa4fe04f69f87859fcb31df3b9469f4e6447921c'
   data = "0x70a08231000000000000000000000000#{financing_address[2..]}"
   financing =
@@ -27,7 +33,7 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
       16
     ).to_f / 10**18
 
-  #   BD & Marketing
+  # BD & Marketing
   bd_marketing_address = '0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47'
   data = "0x70a08231000000000000000000000000#{bd_marketing_address[2..]}"
   bd_marketing =
@@ -38,12 +44,15 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
 
   ecosystem_development_fund = financing + bd_marketing
 
-  # Treasury
+  # 3. Treasury
   treasury_address = '0x6d6f646c64612f74727372790000000000000000'
   treasury =
     darwinia_client.eth_get_balance(treasury_address)['result'].to_i(16).to_f / 10**18
   puts "treasury: #{treasury}"
 
+  ##########################
+  # Calc circulating supply
+  ##########################
   circulating_supply = total_issuance - (reserve + ecosystem_development_fund + treasury).to_i
   puts "circulating_supply: #{circulating_supply}"
 
@@ -55,7 +64,7 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
 end
 
 def calc_kton_supply(rpc, metadata)
-  total_issuance = get_kton_total_insurance(rpc, metadata)
+  total_issuance = Supply::Kton.get_kton_total_insurance(rpc, metadata)
 
   {
     totalSupply: total_issuance,
