@@ -242,6 +242,33 @@ end
 ##############################################################################
 # General
 ##############################################################################
+require_relative './tx_fee'
+get '/:network/fee' do
+  network = params[:network].downcase
+  unless %w[darwinia crab].include?(network)
+    raise_with(
+      404,
+      "#{network} not support"
+    )
+  end
+
+  begin
+    if network == 'darwinia'
+      render_json TxFee.darwinia_fee
+    elsif network == 'crab'
+      render_json TxFee.crab_fee
+    end
+  rescue StandardError => e
+    if e.message.include?('500')
+      puts '------------------------'
+      raise 'data source error, try again later'
+    else
+      puts '2------------------------'
+      raise e
+    end
+  end
+end
+
 get '/:network/accounts/:address' do
   network = params[:network].downcase
   address = params[:address].downcase
@@ -334,6 +361,7 @@ def raise_with(status, message)
 end
 
 error do |e|
+  status 500
   content_type :json
   if e.instance_of?(RuntimeError)
     { code: 1, error: e.message }.to_json

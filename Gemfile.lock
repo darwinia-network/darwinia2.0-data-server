@@ -1,6 +1,11 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    activesupport (7.0.7.2)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 1.6, < 2)
+      minitest (>= 5.1)
+      tzinfo (~> 2.0)
     async (2.5.0)
       console (~> 1.10)
       io-event (~> 1.1)
@@ -56,17 +61,31 @@ GEM
       openssl (>= 2.2, < 4.0)
       rbsecp256k1 (~> 5.1)
       scrypt (~> 3.0)
+    faraday (2.7.10)
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-net_http (3.0.2)
     ffi (1.15.5)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
     fiber-local (1.0.0)
+    graphlient (0.7.0)
+      faraday (~> 2.0)
+      graphql-client
+    graphql (2.0.27)
+    graphql-client (0.18.0)
+      activesupport (>= 3.0)
+      graphql
+    i18n (1.14.1)
+      concurrent-ruby (~> 1.0)
     io-event (1.1.7)
     keccak (1.3.1)
     konstructor (1.0.2)
     lightly (0.4.0)
     mini_portile2 (2.8.1)
     minitar (0.9)
+    minitest (5.20.0)
     mongo (2.18.2)
       bson (>= 4.14.1, < 5.0.0)
     mustermann (3.0.0)
@@ -104,6 +123,8 @@ GEM
     tilt (2.1.0)
     timers (4.3.5)
     tomlrb (1.3.0)
+    tzinfo (2.0.6)
+      concurrent-ruby (~> 1.0)
     xxhash (0.5.0)
     zeitwerk (2.6.7)
 
@@ -116,6 +137,8 @@ DEPENDENCIES
   config
   dotenv
   eth
+  graphlient
+  graphql (= 2.0.27)
   lightly
   mongo (~> 2)
   puma

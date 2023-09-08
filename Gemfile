@@ -12,4 +12,6 @@ gem 'dotenv'
 gem 'eth'
 gem 'puma'
 
+gem 'graphlient'
+gem 'graphql', '2.0.27'
 gem 'lightly'
