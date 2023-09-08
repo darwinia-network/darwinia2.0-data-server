@@ -259,13 +259,9 @@ get '/:network/fee' do
       render_json TxFee.crab_fee
     end
   rescue StandardError => e
-    if e.message.include?('500')
-      puts '------------------------'
-      raise 'data source error, try again later'
-    else
-      puts '2------------------------'
-      raise e
-    end
+    raise 'data source error, try again later' if e.message.include?('500')
+
+    raise e
   end
 end
 
