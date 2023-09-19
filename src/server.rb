@@ -242,7 +242,7 @@ end
 ##############################################################################
 # General
 ##############################################################################
-require_relative './tx_fee'
+require_relative './subsquid/tx_fee'
 get '/:network/fee' do
   network = params[:network].downcase
   unless %w[darwinia crab].include?(network)

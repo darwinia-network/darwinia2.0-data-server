@@ -1,4 +1,5 @@
 require 'graphlient'
+require_relative 'subsquid_client'
 
 module TxFee
   class << self
@@ -53,32 +54,13 @@ module TxFee
     end
 
     def darwinia_fee
-      calc(darwinia_client)
+      calc(SubsquidClient.darwinia)
     end
 
     def crab_fee
-      calc(crab_client)
+      calc(SubsquidClient.crab)
     end
 
-    private
-
-    def darwinia_client
-      Graphlient::Client.new(
-        'https://darwinia.explorer.subsquid.io/graphql',
-        headers: {
-          "User-Agent": 'Darwinia Datahub'
-        }
-      )
-    end
-
-    def crab_client
-      Graphlient::Client.new(
-        'https://crab.explorer.subsquid.io/graphql',
-        headers: {
-          "User-Agent": 'Darwinia Datahub'
-        }
-      )
-    end
   end
 end
 

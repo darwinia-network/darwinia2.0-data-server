@@ -85,6 +85,8 @@ end
 # Multi networks
 ##########################################
 require 'logger'
+require_relative 'src/subsquid/subsquid_client'
+require_relative 'src/subsquid/commission_updates'
 # nominee = active collators + waiting collators + other nominees who have nominations backing
 task :update_nominees, [:network_name] do |_t, args|
   logger = Logger.new($stdout)
@@ -102,6 +104,7 @@ task :update_nominees, [:network_name] do |_t, args|
     collator_commissions = get_collator_commissions(rpc, metadata) # includes active and waiting collators
     active_collator_addresses = get_active_collators(rpc, metadata)
     identities = get_identities(rpc, metadata) # address => name
+    commission_updates_count = CommissionUpdates.commission_updates_count(SubsquidClient.send(network_name))
 
     # 1. Get all nominators with their nominees
     # ---------------------------------------
@@ -166,6 +169,7 @@ task :update_nominees, [:network_name] do |_t, args|
           name: identities[nominee_address],
           power: nominee_powers[nominee_address],
           commission: collator_commissions[nominee_address],
+          commission_updates_count: commission_updates_count[nominee_address] || 0,
           status: get_nominee_status(active_collator_addresses, waiting_collator_addresses, nominee_address)
         }
       ]
