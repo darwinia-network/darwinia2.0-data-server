@@ -169,7 +169,8 @@ task :update_nominees, [:network_name] do |_t, args|
           name: identities[nominee_address],
           power: nominee_powers[nominee_address],
           commission: collator_commissions[nominee_address],
-          commission_updates_count: commission_updates_count[nominee_address] || 0,
+          commission_updates_count: commission_updates_count[nominee_address]&.[](:count) || 0,
+          commission_max_increase: commission_updates_count[nominee_address]&.[](:max_increase),
           status: get_nominee_status(active_collator_addresses, waiting_collator_addresses, nominee_address)
         }
       ]
