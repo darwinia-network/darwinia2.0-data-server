@@ -66,6 +66,8 @@ get '/supply/ring' do
   end
 
   content_type :json
+  headers 'Access-Control-Allow-Origin' => '*'
+
   { code: 0, data: result['ringSupplies'] }.to_json
 end
 
@@ -88,6 +90,8 @@ get '/supply/kton' do
   end
 
   content_type :json
+  headers 'Access-Control-Allow-Origin' => '*'
+
   { code: 0, data: result['ktonSupplies'] }.to_json
 end
 
@@ -101,6 +105,8 @@ get '/seilppuswithbalances' do
   end
 
   content_type :json
+  headers 'Access-Control-Allow-Origin' => '*'
+
   File.read("./data/#{network}-supplies.json")
 end
 
@@ -109,6 +115,8 @@ end
 ##############################################################################
 get '/crab/address/:address' do
   content_type :json
+  headers 'Access-Control-Allow-Origin' => '*'
+
   # address must presented
   return { code: 1, message: 'address is required' }.to_json unless params[:address]
 
@@ -352,6 +360,7 @@ end
 ##############################################################################
 def raise_with(status, message)
   content_type :json
+  headers 'Access-Control-Allow-Origin' => '*'
   ret = { code: 1, message: }.to_json
   halt status, ret
 end
@@ -360,6 +369,7 @@ error do |e|
   status 500
   content_type :json
   if e.instance_of?(RuntimeError)
+    headers 'Access-Control-Allow-Origin' => '*'
     { code: 1, error: e.message }.to_json
   else
     { code: 1, error: "#{e.class} => #{e.message}" }.to_json
@@ -371,6 +381,7 @@ end
 ##############################################################################
 def render_json(result)
   content_type :json
+  headers 'Access-Control-Allow-Origin' => '*'
   raise 'result is null' unless result
 
   { code: 0, result: }.to_json
