@@ -192,7 +192,11 @@ def get_collator_commissions(rpc, metadata)
 end
 
 def get_active_collators(rpc, metadata)
-  storages = get_storage(rpc, metadata, 'darwinia_staking', 'exposures', nil, nil)
+  exposures_cache_id =
+    get_storage(rpc, metadata, 'darwinia_staking', 'exposure_cache_states', nil, nil).index('Current')
+  exposures_storage_name = "exposure_cache#{exposures_cache_id}"
+
+  storages = get_storage(rpc, metadata, 'darwinia_staking', exposures_storage_name, nil, nil)
   storages.map do |storage|
     "0x#{storage[:storage_key][-40..]}"
   end
