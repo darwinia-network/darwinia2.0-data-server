@@ -155,7 +155,17 @@ task :update_nominees, [:network_name] do |_t, args|
     # ---------------------------------------
     nominee_powers = result.map do |nominee_address, staking_info|
       power = calc_power(staking_info[:staked_ring], staking_info[:staked_kton], ring_pool, kton_pool)
-      [nominee_address, power]
+      commission = collator_commissions[nominee_address]
+      commission = commission.nil? ? nil : commission / 100.0
+
+      power_weighted_by_commission =
+        if power.nil? || commission.nil?
+          nil
+        else
+          power * (1 - commission)
+        end
+
+      [nominee_address, [power, power_weighted_by_commission]]
     end.to_h
 
     # 5. Set the collators committee
@@ -163,11 +173,13 @@ task :update_nominees, [:network_name] do |_t, args|
     all_nominee_addresses = (nominee_powers.keys + collator_commissions.keys).uniq
     waiting_collator_addresses = collator_commissions.keys - active_collator_addresses
     result = all_nominee_addresses.map do |nominee_address|
+      power, power_weighted_by_commission = nominee_powers[nominee_address]
       [
         nominee_address,
         {
           name: identities[nominee_address],
-          power: nominee_powers[nominee_address],
+          power:,
+          power_weighted_by_commission:,
           commission: collator_commissions[nominee_address],
           commission_updates_count: commission_updates_count[nominee_address]&.[](:count) || 0,
           commission_max_increase: commission_updates_count[nominee_address]&.[](:max_increase),
