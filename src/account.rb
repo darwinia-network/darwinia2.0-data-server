@@ -192,6 +192,10 @@ def get_collator_commissions(rpc, metadata)
 end
 
 def get_active_collators(rpc, metadata)
+  get_storage(rpc, metadata, 'session', 'validators', nil, nil)
+end
+
+def get_current_exposures(rpc, metadata)
   exposures_cache_id =
     get_storage(rpc, metadata, 'darwinia_staking', 'exposure_cache_states', nil, nil).index('Current')
   exposures_storage_name = "exposure_cache#{exposures_cache_id}"
