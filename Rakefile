@@ -103,6 +103,8 @@ task :update_nominees, [:network_name] do |_t, args|
     kton_pool = get_storage(rpc, metadata, 'darwinia_staking', 'kton_pool', nil, nil)
     collator_commissions = get_collator_commissions(rpc, metadata) # includes active and waiting collators
     active_collator_addresses = get_active_collators(rpc, metadata)
+    current_exposures = get_current_exposures(rpc, metadata)
+    collators_no_session_key = current_exposures - active_collator_addresses
     identities = get_identities(rpc, metadata) # address => name
     commission_updates_count = CommissionUpdates.commission_updates_count(SubsquidClient.send(network_name))
 
@@ -183,7 +185,8 @@ task :update_nominees, [:network_name] do |_t, args|
           commission: collator_commissions[nominee_address],
           commission_updates_count: commission_updates_count[nominee_address]&.[](:count) || 0,
           commission_max_increase: commission_updates_count[nominee_address]&.[](:max_increase),
-          status: get_nominee_status(active_collator_addresses, waiting_collator_addresses, nominee_address)
+          status: get_nominee_status(active_collator_addresses, waiting_collator_addresses, nominee_address),
+          no_session_key: collators_no_session_key.include?(nominee_address)
         }
       ]
     end.to_h
