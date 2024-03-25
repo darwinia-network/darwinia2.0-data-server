@@ -19,18 +19,15 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   ##########################
   # Calc reserves
   ##########################
+  # 1. Ecosystem Multisig Account
   token_contract = '0x9469D013805bFfB7D3DEBe5E7839237e535ec483'
-  
-  # 1. 生态多签
-  bd_marketing_address = '0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47'
-  data = "0x70a08231000000000000000000000000#{bd_marketing_address[2..]}"
-  bd_marketing =
+  eco_multisig_address = '0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47'
+  data = "0x70a08231000000000000000000000000#{eco_multisig_address[2..]}"
+  eco_multisig =
     ethereum_client.eth_call({ to: token_contract, data: })['result'].to_i(
       16
     ).to_f / 10**18
-  puts "financing: #{financing}, bd_marketing: #{bd_marketing}"
-
-  ecosystem_development_fund = financing + bd_marketing
+  puts "eco_multisig: #{eco_multisig}"
 
   # 2. Treasury
   treasury_address = '0x6d6f646c64612f74727372790000000000000000'
@@ -41,7 +38,7 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   ##########################
   # Calc circulating supply
   ##########################
-  circulating_supply = total_issuance - (ecosystem_development_fund + treasury).to_i
+  circulating_supply = total_issuance - (eco_multisig + treasury).to_i
   puts "circulating_supply: #{circulating_supply}"
 
   {
