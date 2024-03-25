@@ -19,17 +19,9 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   ##########################
   # Calc reserves
   ##########################
-  # 1. Ecosystem Development Fund
   token_contract = '0x9469D013805bFfB7D3DEBe5E7839237e535ec483'
-  # 1.1. Financing
-  financing_address = '0xfa4fe04f69f87859fcb31df3b9469f4e6447921c'
-  data = "0x70a08231000000000000000000000000#{financing_address[2..]}"
-  financing =
-    ethereum_client.eth_call({ to: token_contract, data: })['result'].to_i(
-      16
-    ).to_f / 10**18
-
-  # 1.2. 生态多签
+  
+  # 1. 生态多签
   bd_marketing_address = '0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47'
   data = "0x70a08231000000000000000000000000#{bd_marketing_address[2..]}"
   bd_marketing =
