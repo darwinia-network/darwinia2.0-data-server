@@ -50,10 +50,10 @@ Circulating Supply: Total Supply - Reserved
 
 ### Reserved
 
-1. Ecosystem Multisig Account(Ecosystem Development Fund)
+1. Ecosystem Multisig Account(Ecosystem Development Fund)  
    https://etherscan.io/address/0xfa4fe04f69f87859fcb31df3b9469f4e6447921c
    
-2. Treasury:
+2. Treasury  
    https://darwinia.subscan.io/account/0x6d6f646c64612f74727372790000000000000000
 
 ## RINGS of an account
