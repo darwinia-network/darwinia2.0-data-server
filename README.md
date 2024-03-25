@@ -50,11 +50,11 @@ Circulating Supply: Total Supply - Reserved
 
 ### Reserved
 
-1. Reserve on Darwinia Chain: https://darwinia.subscan.io/account/2rNgQRqCQ6U9UHHvjVBfvo22sJRLD5md7TcXDrZSVfxetx1J
-2. Ecosystem Development Fund: https://etherscan.io/address/0xfa4fe04f69f87859fcb31df3b9469f4e6447921c
-3. Treasury:
-   1. Darwinia1 Account: https://darwinia.subscan.io/account/2qeMxq616BhswywHP1MzwCEKX1ibEQ4DKJw95NppvWxy2Fka
-   2. Darwinia2 Account: 0x6d6f646c64612f74727372790000000000000000
+1. Ecosystem Multisig Account(Ecosystem Development Fund)
+   https://etherscan.io/address/0xfa4fe04f69f87859fcb31df3b9469f4e6447921c
+   
+2. Treasury:
+   https://darwinia.subscan.io/account/0x6d6f646c64612f74727372790000000000000000
 
 ## RINGS of an account
 
