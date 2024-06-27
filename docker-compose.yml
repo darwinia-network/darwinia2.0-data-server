@@ -12,20 +12,20 @@ services:
     command: rake gen_supplies_data_loop
     volumes:
       - ./data:/usr/src/app/data
-  update_nominees:
-    build: .
-    env_file:
-      - .env
-    command: rake update_nominees_loop
-    volumes:
-      - ./data:/usr/src/app/data
-  update_staking:
-    build: .
-    env_file:
-      - .env
-    command: rake update_staking_data_loop
-    volumes:
-      - ./data:/usr/src/app/data
+  # update_nominees:
+  #   build: .
+  #   env_file:
+  #     - .env
+  #   command: rake update_nominees_loop
+  #   volumes:
+  #     - ./data:/usr/src/app/data
+  # update_staking:
+  #   build: .
+  #   env_file:
+  #     - .env
+  #   command: rake update_staking_data_loop
+  #   volumes:
+  #     - ./data:/usr/src/app/data
   server:
     build: .
     env_file:
