@@ -12,33 +12,26 @@ def calc_ring_supply(ethereum_rpc, darwinia_rpc, metadata)
   ethereum_client = Eth::Client::Http.new(ethereum_rpc)
 
   ##########################
-  # Calc total issuance
+  # total issuance
   ##########################
   total_issuance = Supply::Ring.get_total_insurance(darwinia_rpc, metadata)
+  puts "total_issuance: #{total_issuance}"
 
   ##########################
-  # Calc reserves
+  # reserves
   ##########################
-  # 1. Ecosystem Multisig Account
-  token_contract = '0x9469D013805bFfB7D3DEBe5E7839237e535ec483'
-  eco_multisig_address = '0x5FD8bCC6180eCd977813465bDd0A76A5a9F88B47'
-  data = "0x70a08231000000000000000000000000#{eco_multisig_address[2..]}"
-  eco_multisig =
-    ethereum_client.eth_call({ to: token_contract, data: })['result'].to_i(
-      16
-    ).to_f / 10**18
-  puts "eco_multisig: #{eco_multisig}"
+  # 1. darwinia:0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284
+  darwinia_0x081c = darwinia_client.eth_get_balance('0x081cbab52e2dBCd52F441c7ae9ad2a3BE42e2284')['result'].to_i(16).to_f / 10**18
+  puts "darwinia_0x081c: #{darwinia_0x081c}"
 
-  # 2. Treasury
-  treasury_address = '0x6d6f646c64612f74727372790000000000000000'
-  treasury =
-    darwinia_client.eth_get_balance(treasury_address)['result'].to_i(16).to_f / 10**18
-  puts "treasury: #{treasury}"
+  # 2. darwinia:0x6d6f646c64612f74727372790000000000000000
+  darwinia_0x6d6f = darwinia_client.eth_get_balance('0x6d6f646c64612f74727372790000000000000000')['result'].to_i(16).to_f / 10**18
+  puts "darwinia_0x6d6f: #{darwinia_0x6d6f}"
 
   ##########################
-  # Calc circulating supply
+  # circulating supply
   ##########################
-  circulating_supply = total_issuance - (eco_multisig + treasury).to_i
+  circulating_supply = total_issuance - (darwinia_0x081c + darwinia_0x6d6f).to_i
   puts "circulating_supply: #{circulating_supply}"
 
   {
@@ -50,6 +43,7 @@ end
 
 def calc_kton_supply(rpc, metadata)
   total_issuance = Supply::Kton.get_kton_total_insurance(rpc, metadata)
+  puts "kton total_issuance: #{total_issuance}"
 
   {
     totalSupply: total_issuance,
@@ -77,10 +71,9 @@ def generate_supplies(network_name, ethereum_rpc, darwinia_rpc, metadata)
   end
 end
 
-# require_relative "../config/config.rb"
-# config = get_config
-# darwinia_metadata = JSON.parse(File.read(config[:metadata][:darwinia]))
-# darwinia_rpc = config[:darwinia_rpc]
-# ethereum_rpc = config[:ethereum_rpc]
-
-# generate_supplies("darwinia", ethereum_rpc, darwinia_rpc, darwinia_metadata)
+require_relative "../config/config.rb"
+config = get_config
+darwinia_metadata = JSON.parse(File.read(config[:metadata][:darwinia]))
+darwinia_rpc = config[:darwinia_rpc]
+ethereum_rpc = config[:ethereum_rpc]
+generate_supplies("darwinia", ethereum_rpc, darwinia_rpc, darwinia_metadata)
